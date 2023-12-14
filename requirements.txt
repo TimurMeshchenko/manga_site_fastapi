@@ -3,3 +3,6 @@ fastapi
 pydantic
 jinja2
 psycopg2
+python-multipart
+"python-jose[cryptography]"
+"passlib[bcrypt]"
