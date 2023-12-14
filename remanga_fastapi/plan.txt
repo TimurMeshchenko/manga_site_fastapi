@@ -1,0 +1,20 @@
+Пользователь, регистрация, вход, выход на jwt
+
+через alembic создать Пользователя, перед этим создать backup бд 
+
+Для тайтлов post
+
+Поиск, смена авы, пароля, infinity scroll
+
+-------------------------------------------
+
+WebSokets вместо ajax
+
+Пернести все запросы без template get,post в /api/
+router = APIRouter(prefix="/api/")
+
+-------------------------------------------
+
+python -m uvicorn main:app --reload
+redis + restapi, asyncio, закинуть в docker
+Пароль у акков fsafsafzcx
