@@ -1,33 +1,28 @@
-johndoe secret
-
 Пользователь, регистрация, вход, выход на jwt
 
-Брать Пользователя с auth_user таблицы
-Сделать поля в models, schemas как в таблице
+защита от CSRF для post
 
-Переписать utils.get_user, чтобы брал пользователя с бд 
-и для убрать в аргументах бд для всех кто вызывает utils.get_user
+При post, сравниваю headers с cookie, если разные raise ошибку и 
+перезагружаю страницу и csrf_token добавляю в cookie и headers
 
+объеденить 3 строчки generate_csrf_token в метод и вызывать его 
+для всех get у который есть current_user (без middleware)
 
-Привязать к html
-Спрос у ai регистрация fastapi
+Для всех post utils.validate_csrf(request),(с middleware) если ошибка 
+invalid_csrf_token перезагрузить страницу, чтобы получить новый,
+если возможно то при вызове ошибки перенаправлять на этот же url, обновить,
+а не в fetch по содержанию
 
-Для регистрации, отправлять через post данные из полей 
-и создавать по ним пользователя (возможно есть готовая форма, как с входом)
-В utils.create_user
+Если выход, то удалить куки
 
-Для авторизации также только с токеном
-Спросить как сделать template с OAuth2PasswordRequestForm
+После регистрации, входить
 
-Спросить про выход, думаю user.disabled = true
+Могут ли перехватить fetch запрос, уязвимости post запросов
 
 -------------------------------------------
 
 Для тайтлов post
 WebSokets вместо ajax
-
-Пернести все запросы без template get,post в /api/
-router = APIRouter(prefix="/api/")
 
 -------------------------------------------
 
@@ -35,6 +30,19 @@ router = APIRouter(prefix="/api/")
 
 -------------------------------------------
 
-python -m uvicorn main:app --reload
-redis + restapi, asyncio, закинуть в docker
 Пароль у акков fsafsafzcx
+python -m uvicorn main:app --reload
+
+redis, RabbitMQ, asyncio, закинуть в docker
+
+везде подсказки, что возвращает (в router response_model)
+тесты, gitflow
+
+переписать под mongodb
+
+django docker через nginx + uvicorn, fastapi если получится
+
+QA Automation Selenium, Bash, Web-UI, API
+
+Если получится то создать для докера bash скрипты, для django,
+как минимум переименование db host

@@ -1,30 +1,22 @@
 from typing import Annotated
-from fastapi import Depends
-from jose import JWTError, jwt
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import Depends, Request
+from sqlalchemy.orm import Session
 
 from . import utils, exceptions, models, schemas
+from config import get_db
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token") 
-
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):    
-    try:
-        payload = jwt.decode(token, utils.SECRET_KEY, algorithms=[utils.ALGORITHM])
-        username: str = payload.get("sub")
-
-        if username is None:
-            exceptions.invalid_credentials()
-        
-        token_data = schemas.TokenData(username=username)
-    except JWTError:
-        exceptions.invalid_credentials()
+async def get_current_user(request: Request, db: Session = Depends(get_db)):        
+    token = request.cookies.get("jwt_token")
     
-    user = utils.get_user(models.fake_users_db, username=token_data.username)
+    if not token: return 
+    
+    token_data = utils.get_token_data(token)
+    user = utils.get_user(db, username=token_data.username)
     
     if user is None:
         exceptions.invalid_credentials()
     
-    if user.disabled:
+    if not user.is_active:
         exceptions.inactive_user()
     
     return user

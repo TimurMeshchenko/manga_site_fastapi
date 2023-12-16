@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel
 
 class Token(BaseModel):
@@ -8,10 +9,26 @@ class TokenData(BaseModel):
     username: str | None = None
 
 class User(BaseModel):
+    id: int
+    password: str
+    last_login: datetime
+    is_superuser: bool
     username: str
+    first_name: str | None = None
+    last_name: str | None = None
     email: str | None = None
-    full_name: str | None = None
-    disabled: bool | None = None
+    is_staff: bool
+    is_active: bool
+    date_joined: datetime
+    avatar: str
 
-class UserInDB(User):
-    hashed_password: str
+class UserSignup(BaseModel):
+    username: str
+    email: str
+    password: str
+    password2: str
+
+class UserSignin(BaseModel):
+    username: str
+    password: str
+

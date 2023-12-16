@@ -1,7 +1,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger, Float, Table, desc
 from sqlalchemy.orm import relationship
 
-from database import Base
+from database import Base, metadata
 
 remanga_title_categories = Table('remanga_title_categories', Base.metadata,
     Column('id', BigInteger, primary_key=True),
