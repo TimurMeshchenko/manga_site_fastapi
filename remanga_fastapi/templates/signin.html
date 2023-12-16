@@ -5,13 +5,13 @@
 {% endblock %}
 
 {% block css %}
-  <link rel="preload" href="{{ url_for('static', path='signin/cb4f8de50573f9d5.css') }}" as="style" /> 
-  <link rel="stylesheet" href="{{ url_for('static', path='signin/cb4f8de50573f9d5.css') }}" data-n-g="" />
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='signin/843ea9ec36d246ae.css') }}" />
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='signin/920c959cc716ad46.css') }}" />
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='signin/029ac71e4e31b456.css') }}" />
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='signin/09e4f43c14f4840f.css') }}" />
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='signin/9dd15375466b1de0.css') }}" />
+  <link rel="preload" href="{{ url_for('static', path='signin/css/cb4f8de50573f9d5.css') }}" as="style" /> 
+  <link rel="stylesheet" href="{{ url_for('static', path='signin/css/cb4f8de50573f9d5.css') }}" data-n-g="" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='signin/css/843ea9ec36d246ae.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='signin/css/920c959cc716ad46.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='signin/css/029ac71e4e31b456.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='signin/css/09e4f43c14f4840f.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='signin/css/9dd15375466b1de0.css') }}" />
 {% endblock %}
   
 {% block styles %}
@@ -141,12 +141,13 @@
   </div>
     <p
       class="Typography_body2__piveF Typography_color-primary__xoN6_ Typography_bold__SKyBL Typography_align-center__j_M0w">
-      <a href="" class="jsx-4c4906b68fb5f50a"
+      <a href="{{ url_for('remanga:signup') }}" class="jsx-4c4906b68fb5f50a"
         style="color: var(--primary-light);">Зарегистрироваться</a>
     </p>
   </div>
   </div>
-  <script src="{{ url_for('static', path='signin/signin_post.js') }}"></script> 
+  <script src="{{ url_for('static', path='signin/js/signin_post.js') }}"></script> 
+  <script src="{{ url_for('static', path='title/js/fetch_request.js') }}"></script> 
   <script>
     listen_signin_button('{{ csrf_token }}')
   </script>

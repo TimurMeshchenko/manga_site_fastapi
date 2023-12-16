@@ -664,14 +664,43 @@
     <nav class="jsx-2a8f39a92d173359 Header_nav__V78KK">
       <div class="jsx-2a8f39a92d173359 Header_navContainer__3fCGy flexAuto">
         <div style="max-width: 300px" class="jsx-2a8f39a92d173359 hidden-smDown Header_navContainer__3fCGy ml16">
+          <a class="Button_button__JOS9_ Header_headerLink__EvjUK hidden-mdDown" tabindex="0" role="button"
+            href="">
+            Поиск</a>
           <a class="Button_button__JOS9_ Header_headerLink__EvjUK" tabindex="0" role="button"
-            href="{{ url_for('remanga:catalog') }}">Каталог</a> 
+            href="{{ url_for('remanga:catalog') }}">Каталог</a>
         </div>
       </div>
       <div class="jsx-2a8f39a92d173359 Header_navContainer__3fCGy"></div>
       <div class="jsx-2a8f39a92d173359 Header_navContainer__3fCGy justify-end flexAuto">
         <div class="hidden-xsDown Header_navContainer__3fCGy">
+          {% if user %}
+          <a class="Button_button__JOS9_ Header_headerLink__EvjUK hidden-mdDown" tabindex="0" role="button"
+            href="{{ url_for('remanga:profile', user_id=user.id) }}">Закладки
+          </a>
+          {% else %}
+          <a class="Button_button__JOS9_ Header_headerLink__EvjUK hidden-mdDown" tabindex="0" role="button"
+            href="{{ url_for('remanga:signin') }}">Закладки
+          </a>
+          {% endif %}
         </div>
+        {% if user %}
+        <div class="Avatar_avatar__hG0bH Avatar_colorDefault__MHL29 jsx-88620ec3676b2b4a">
+          <a href="{{ url_for('remanga:profile', user_id=user.id) }}">
+            {% if user.avatar %}
+            <img class="profile-pic" src="/media/{{ user.avatar }}" style="width: 100%;">
+            {% else %}
+            <img class="profile-pic" src='/media/users_avatars/no_avatar.jpg' style="width: 100%;">
+            {% endif %}
+          </a>
+        </div>
+        {% else %}
+        <button
+          class="Button_button__JOS9_ Button_button__JOS9_ Button_contained__C0zVd Button_contained-primary__ZtvzA hidden-xsDown"
+          tabindex="0" type="button" style="margin-left: 8px">
+          <a class="Button_label__py8bK" href="{{ url_for('remanga:signin') }}">Войти</a>
+        </button>
+        {% endif %}
       </div>
     </nav>
   </header>

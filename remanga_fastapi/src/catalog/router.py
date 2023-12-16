@@ -2,11 +2,14 @@ from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from fastapi.encoders import jsonable_encoder
+from typing import Annotated
 
 from . import utils, models, titles_filters
 from database import engine
 from title.models import Title
 from config import get_db
+from auth.schemas import User
+from auth.dependencies import get_current_user
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -15,7 +18,8 @@ router = APIRouter(tags=["catalog"])
 templates = Jinja2Templates(directory="../templates")
 
 @router.get("/", name="remanga:catalog")
-async def catalog(request: Request, db: Session = Depends(get_db)):
+async def catalog(request: Request, current_user: Annotated[User, Depends(get_current_user)], 
+                  db: Session = Depends(get_db)):
     titles = db.query(Title)
     context = {}
 
@@ -30,6 +34,7 @@ async def catalog(request: Request, db: Session = Depends(get_db)):
         context[database_table_data_key] = jsonable_encoder(database_tables_data[database_table_data_key])
 
     context["request"] = request
+    context["user"] = current_user
     context["titles_list"] = titles.all()
 
     return templates.TemplateResponse("catalog.html", context)

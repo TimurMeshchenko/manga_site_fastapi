@@ -1,7 +1,8 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger, Float, Table, desc
+from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger, Float, Table, Text, TIMESTAMP
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
-from database import Base, metadata
+from database import Base
 
 remanga_title_categories = Table('remanga_title_categories', Base.metadata,
     Column('id', BigInteger, primary_key=True),
@@ -21,10 +22,11 @@ remanga_title_chapters = Table('remanga_title_chapters', Base.metadata,
     Column('chapters_id', BigInteger, ForeignKey('remanga_chapters.id'))
 )
 
-# remanga_title_comments = Table('remanga_title_comments', Base.metadata,
-#     Column('title_id', BigInteger, ForeignKey('remanga_title.id')),
-#     Column('comment_id', BigInteger, ForeignKey('remanga_comment.id'))
-# )
+remanga_title_comments = Table('remanga_title_comments', Base.metadata,
+    Column('id', BigInteger, primary_key=True),
+    Column('title_id', BigInteger, ForeignKey('remanga_title.id')),
+    Column('comment_id', BigInteger, ForeignKey('remanga_comment.id'))
+)
 
 class Genres(Base):
     __tablename__ = 'remanga_genres'
@@ -45,6 +47,17 @@ class Chapters(Base):
     chapter = Column(Integer, default=0)
     tome = Column(Integer, default=0)
 
+class Comment(Base):
+    __tablename__ = 'remanga_comment'
+
+    id = Column(Integer, primary_key=True)
+    author_id = Column(BigInteger, ForeignKey('user.id'))
+    content = Column(Text)
+    created_at = Column(TIMESTAMP(timezone=True), default=func.now())
+    likes = Column(Integer, default=0)
+
+    author = relationship('User', backref='remanga_comment')
+
 class Title(Base):
     __tablename__ = 'remanga_title'
 
@@ -63,4 +76,4 @@ class Title(Base):
     categories = relationship('Categories', secondary=remanga_title_categories, backref='remanga_title')
     genres = relationship('Genres', secondary=remanga_title_genres, backref='remanga_title')
     chapters = relationship('Chapters', secondary=remanga_title_chapters, backref='remanga_title')
-    # comments = relationship('Comment', secondary=remanga_title_comments, backref='remanga_title')
+    comments = relationship('Comment', secondary=remanga_title_comments, backref='remanga_title')

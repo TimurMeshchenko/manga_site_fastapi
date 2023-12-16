@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from datetime import datetime
 
 class Categories(BaseModel):
     id: int
@@ -12,6 +13,16 @@ class Chapters(BaseModel):
     id: int
     chapter: int
     tome: int
+
+class Comment(BaseModel):
+    id: int
+    author_id: int
+    content: str
+    created_at: datetime
+    likes: int = 0
+
+    class Config:
+        from_attributes = True
 
 class Title(BaseModel):
     id: int
@@ -28,7 +39,7 @@ class Title(BaseModel):
     categories: list[Categories]
     genres: list[Genres]
     chapters: list[Chapters]
-    # comments: list[Comment] = []
+    comments: list[Comment] = []
     
     class Config:
         from_attributes = True

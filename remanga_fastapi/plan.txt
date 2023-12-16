@@ -1,48 +1,58 @@
-Пользователь, регистрация, вход, выход на jwt
+CSRF для title
+Добавить в context is_bookmark_added
 
-защита от CSRF для post
+WebSokets добавлять в закладки(send_text без broadcast) 
+должен добавиться новый тайтл для всех вкладкок с закладками, 
 
-При post, сравниваю headers с cookie, если разные raise ошибку и 
-перезагружаю страницу и csrf_token добавляю в cookie и headers
+Listener на кнопку добавить в закладки
+При клике отправляю json user и title id (json.stringify)
 
-объеденить 3 строчки generate_csrf_token в метод и вызывать его 
-для всех get у который есть current_user (без middleware)
+В websocket_endpoint Если нет в json поля content, то change_bookmark()
+отправляю json 'is_bookmark_added', 'title_count_bookmarks'
 
-Для всех post utils.validate_csrf(request),(с middleware) если ошибка 
-invalid_csrf_token перезагрузить страницу, чтобы получить новый,
-если возможно то при вызове ошибки перенаправлять на этот же url, обновить,
-а не в fetch по содержанию
+в ws.onmessage update_data()
 
-Если выход, то удалить куки
-
-После регистрации, входить
-
-Могут ли перехватить fetch запрос, уязвимости post запросов
+оцеки тайтла(fetch), коменты(broadcast) и их оценка(fetch)
 
 -------------------------------------------
 
-Для тайтлов post
-WebSokets вместо ajax
+Поиск, смена авы (фильтр только картинки fetch), пароля, 
+infinity scroll (fetch) CSRF
 
 -------------------------------------------
 
-Поиск, смена авы, пароля, infinity scroll
+redis + celery отправка email с использованием smtplib, docker
 
+-------------------------------------------
+
+везде подсказки, что возвращает (в router response_model)
+тесты, gitflow
+
+asyncio парсер
+
+-------------------------------------------
+
+написать еще все под mongodb
+
+-------------------------------------------
+
+Админка, если делать то свою с удалением тайтлов, пользователей,
+сообщений, как в django или поискать по лучше
+
+-------------------------------------------
+
+django docker через nginx + uvicorn, fastapi если получится
+
+-------------------------------------------
+
+Если получится то создать для докера bash скрипты, для django,
+как минимум переименование db host
+
+QA Automation Selenium, Bash, Web-UI, API
 -------------------------------------------
 
 Пароль у акков fsafsafzcx
 python -m uvicorn main:app --reload
 
-redis, RabbitMQ, asyncio, закинуть в docker
-
-везде подсказки, что возвращает (в router response_model)
-тесты, gitflow
-
-переписать под mongodb
-
-django docker через nginx + uvicorn, fastapi если получится
-
-QA Automation Selenium, Bash, Web-UI, API
-
-Если получится то создать для докера bash скрипты, для django,
-как минимум переименование db host
+python -m alembic revision --autogenerate -m "init"
+python -m alembic upgrade head

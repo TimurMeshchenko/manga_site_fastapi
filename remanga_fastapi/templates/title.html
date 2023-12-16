@@ -955,7 +955,7 @@
                   </div>
                   <div class="jsx-7721551bb9cc7c76 container">
                     <h4 class="Typography_h4__1eVxk Typography_gutterBottom__mjtdd">
-                      Комментарии 
+                      Комментарии {{ title.comments|length }}
                     </h4>
                     <div class="jsx-98e73d71ac525cf0" style="padding: 8px 0px">
                       <div class="jsx-934d5549bc0ba301 root fullWidth Input_formControl__KCNcj">
@@ -996,7 +996,7 @@
                         <div class="jsx-3914328852 Comments_media__5h5tS">
                           <a href="">
                             {% if comment.author.avatar %}
-                            <img src="{{ comment.author.avatar.url }}" alt="..."
+                            <img src="/media/{{ comment.author.avatar }}" alt="..."
                               class="jsx-3914328852 Comments_mediaAvatar__IuIbH" />
                             {% else %}
                             <img src="/media/users_avatars/no_avatar.jpg" alt="..." 
@@ -1008,7 +1008,7 @@
                               <div class="jsx-3914328852 Comments_mediaHeading___sytl flex items-center">
                                 <a class="Comments_username__BIt0K"
                                   href="">{{ comment.author.username }}
-                                </a><small class="jsx-3914328852">· </small> 
+                                </a><small class="jsx-3914328852">· {{ comment.created_at|timesince }}</small> 
                                 <div class="jsx-3914328852 ml-auto flex items-center">
                                 </div>
                               </div>
@@ -1132,7 +1132,7 @@
 <script src="{{ url_for('static', path='title/js/title_menu_switcher.js') }}"></script> 
 
 <script>
-  const title_menu_switcher = new Title_menu_switcher("","","");
+  const title_menu_switcher = new Title_menu_switcher("{{ title_rating }}","{{ user }}");
 
   function add_chapters_menu(description_element) {
     description_element.parentNode.insertAdjacentHTML('beforeend', `  

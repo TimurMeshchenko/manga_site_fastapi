@@ -1,4 +1,4 @@
-{% extends "signin.html" %} {% load static %}
+{% extends "signin.html" %}
 
 {% block title %}
 <title>Профиль пользователя {{ profile.username }}</title>
@@ -4934,11 +4934,10 @@
         <div class="jsx-944474436 Profile_avatarContainer__uuWxj grid-item">
           <div class="relative">
             <form method="post" enctype="multipart/form-data" class="form_avatar">
-              {% csrf_token %}
               <div
                 class="Avatar_avatar__hG0bH Avatar_colorDefault__MHL29 Profile_editable__WH_yD Profile_avatar__dAlS6">
                 {% if profile.avatar %}
-                <img class="profile-pic" src="{{ profile.avatar.url }}" style="width: 100%;">
+                <img class="profile-pic" src="/media/{{ profile.avatar }}" style="width: 100%;">
                 {% else %}
                   <img class="profile-pic" src='/media/users_avatars/no_avatar.jpg' style="width: 100%;">
                 {% endif %}
@@ -4946,17 +4945,7 @@
               
               {% if user.username == profile.username %}
                 <input type="file" name="avatar" accept="image/*" id="id_avatar" style="display: none;">
-            
-                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-                <script src="{% static 'title/js/ajax/ajax_post.js' %}"></script>
-                <script src="{% static 'profile/ajax/profile_avatar_post.js' %}"></script>
-
-                <script>
-                  new Profile_avatar_post();            
-                </script>
-
               {% endif %}
-
             </form>
           </div>
         </div>
@@ -4972,7 +4961,6 @@
         <div class="Profile_section__BorR5">
           <p class="Typography_h5__8pAxj Typography_paragraph__0uo0K">Сменить пароль</p>
           <form method="post" autocomplete="off" class="jsx-906c1143844456b1 form">
-            {% csrf_token %}
             <div class="jsx-261496919888b024 root fullWidth Input_formControl__B11lU">
               <div class="Input_root___0KQ3 Input_outlined__GjuSL">
                 <input aria-invalid="false" name="old_password" placeholder="Старый пароль" rows="1" type="password"
@@ -4994,22 +4982,24 @@
               </div>
               <p class="Input_formHelperText__EwCsr"></p>
             </div>
-            {% for field in form %}
-            {% for error in field.errors %}
-            <p style="color: red">{{ error }}
-              {% endfor %}
-              {% endfor %}
-
+            <p class="exceptions"></p>
               <button
                 class="Button_button___CisL Button_button___CisL Button_contained__8_KFk Button_contained-primary__IViyX"
                 tabindex="0" type="submit" style="color: rgb(255, 255, 255);"><span class="Button_label__jamx3">Сменить
                   пароль</span></button>
           </form>
         </div>
-        <a href="{% url 'remanga:logout' %}"><button class="Button_button___CisL Button_button___CisL Button_contained__8_KFk Button_contained-primary__IViyX">Выход</button></a>
+        <a href="{{ url_for('remanga:logout') }}">
+          <button class="Button_button___CisL Button_button___CisL Button_contained__8_KFk Button_contained-primary__IViyX Button_logout">Выход</button>
+        </a>
         {% endif %}
       </div>
     </div>
   </main>
 </div>
+
+<script src="{{ url_for('static', path='profile/profile_avatar_post.js') }}"></script>
+<script src="{{ url_for('static', path='title/js/fetch_request.js') }}"></script>
+<script>
+</script>
 {% endblock %}
