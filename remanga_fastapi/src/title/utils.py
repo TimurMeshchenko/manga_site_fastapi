@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from fastapi import WebSocket
 
 def timesince(value):
     now = datetime.now(timezone.utc)
@@ -31,6 +32,22 @@ def get_title_comments_ratings(current_user, title_id):
         
     return None
 
-async def broadcast(connections: dict, message: str):
-    for user_id in connections:
-        await connections[user_id].send_text(message)
+async def is_valid_websocket_csrf(websocket: WebSocket, data):
+    received_websockets_csrf_token = data['websockets_csrf_token']
+    stored_websockets_csrf_token = websocket.cookies['websockets_csrf_token']
+
+    if received_websockets_csrf_token != stored_websockets_csrf_token:
+        await websocket.close()
+        return False 
+    
+    return True   
+
+async def broadcast(connections: dict, response: dict):
+    for session_id in connections:
+        await connections[session_id].send_json(response) 
+
+async def one_user_broadcast(connections: dict, response: dict, user_id: int):
+    for session_id in connections:
+        if session_id.split("-")[0] == str(user_id):
+            await connections[session_id].send_json(response) 
+

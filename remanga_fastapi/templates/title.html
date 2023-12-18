@@ -851,11 +851,9 @@
                     src="/media/titles/{{ title.img_url }}" />
                 </div>
                 <div class="jsx-525f9ca96b40a0e6 buttons">
-                  <form method="post" class="form_bookmark">
                     <button
-                      class="Button_button__JOS9_ Button_button__JOS9_ Button_contained__C0zVd Button_contained-primary__ZtvzA Button_fullWidth__iQYat"
-                      tabindex="0" type="submit" style="font-weight: 600; border-radius: 8px" name="form_name"
-                      value="bookmark">
+                      class="Button_button__JOS9_ Button_button__JOS9_ Button_contained__C0zVd Button_contained-primary__ZtvzA Button_fullWidth__iQYat Button_bookmark"
+                      tabindex="0" style="font-weight: 600; border-radius: 8px" onclick="listen_bookmark_button()">
                       <span class="Button_label__py8bK"><span
                           class="Button_startIcon__LY2Am Button_icon-size-medium__SLolh"><span style="width: 16px"
                             class="jsx-525f9ca96b40a0e6"></span></span>
@@ -864,8 +862,8 @@
                         {% else %}
                         Добавить в список
                         {% endif %}
-                        </span></button>
-                  </form>
+                      </span>
+                    </button>
                 </div>
               </div>
             </div>
@@ -1222,5 +1220,18 @@
 <script>
   new Comment_input_stylization();
 </script>
+<script src="{{ url_for('static', path='title/js/requests_post/bookmark_post.js') }}"></script>
+<script>
+  const user_id = "{{ user }}" ? "{{ user.id }}" : "";
+  const bookmark_button = user_id ? document.querySelector(".Button_bookmark") : null;
+  const title_count_bookmarks = document.querySelector(".title_count_bookmarks");
+  const title_id = "{{ title.id }}";
 
+  const session_id = generate_session_id();
+  const ws = new WebSocket(`ws://localhost:8000/ws/${session_id}`);
+  let websoket_data = null
+
+  handler_websocket_response();
+  listen_websocket_close();
+</script>
 {% endblock %}

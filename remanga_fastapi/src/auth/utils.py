@@ -21,8 +21,6 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/signin")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-templates = Jinja2Templates(directory="../templates")
-
 def verify_password(plain_password: str, hashed_password: str):
     return pwd_context.verify(plain_password, hashed_password)
 
@@ -95,7 +93,7 @@ def is_invalid_password(password):
     password_pattern = r'^[a-zA-Z0-9_@$!%*?&-]{6,}$'
     return re.match(password_pattern, password) is None
 
-def set_context_and_cookie_csrf_token(context: dict, template_name: str):
+def set_context_and_cookie_csrf_token(templates: Jinja2Templates, context: dict, template_name: str):
     csrf_token = secrets.token_hex(32)
 
     context["csrf_token"] = csrf_token

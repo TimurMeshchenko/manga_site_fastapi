@@ -22,7 +22,7 @@ async def signin(request: Request, current_user: Current_user):
     if current_user: return RedirectResponse(url="/", status_code=303)
     
     context = {"request": request}
-    response = utils.set_context_and_cookie_csrf_token(context, "signin.html")
+    response = utils.set_context_and_cookie_csrf_token(templates, context, "signin.html")
 
     return response
 
@@ -43,7 +43,7 @@ async def signup(request: Request, current_user: Current_user):
     if current_user: return RedirectResponse(url="/", status_code=303)
 
     context = {"request": request}
-    response = utils.set_context_and_cookie_csrf_token(context, "signup.html")
+    response = utils.set_context_and_cookie_csrf_token(templates, context, "signup.html")
 
     return response
 

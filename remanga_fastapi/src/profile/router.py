@@ -21,7 +21,7 @@ async def profile(user_id: int, request: Request,
     context["profile"] = db.query(models_User).filter(models_User.id == user_id).first()
     context["user"] = current_user
 
-    response = set_context_and_cookie_csrf_token(context, "profile.html")
+    response = set_context_and_cookie_csrf_token(templates, context, "profile.html")
 
     return response
 
