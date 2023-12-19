@@ -1,24 +1,77 @@
-В catalog к кнопке привязать bookmarks
+коменты(title_broadcast)
 
-в bookmarks script в js файл
+в router в функции
 
-для websoket response добавить type: bookmark
+создать websockets.js с generate_session_id, handler_websocket_response,
+create_websoket_data, update_elements
 
-для ws.onmessage если не response.type != bookmark return
+websockets_bookmarks и _comments наследуют переписывают
+create_websoket_data, update_elements
+У каждого свой listen_bookmark_button
+словарь type: class
 
-title router context создавать как словарь
+в handler_websocket_response if (is_onopen) у обоих.create_websoket_data
+словарь[response.type].update_elements() 
 
-websockets_csrf_token через generate_csrf_token
+каждую минуту отправлять запрос на обновление времени первых 10 коментов
 
-title websocket в utils на методы
+fetch get /api/get_last_comments?title_id={title_id}
+return title.comments.limit(10)
+
+заменяю время
 
 -------------------------------------------
 
-оценки тайтла(fetch), 
-коменты(broadcast только для соеденений с текущим тайтлом)
-тоже самый broadcast, как с пользователем, только для соеденений одного тайтла 
-добавить к session еще title_id
-оценка коментов(fetch)
+оценка коментов(title_broadcast) переделать таблицу
+Нужно подсветить комент который пользователь оценил.
+
+удалить remanga_title_comments_ratings и _comments_(dis)likes, user_titles_comments_ratings
+
+class Comment_rating(Base):
+    __tablename__ = 'remanga_comment_rating'
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(BigInteger, ForeignKey('user.id'))
+    title_id = Column(BigInteger, ForeignKey('remanga_title.id'))
+    comment_id = Column(BigInteger, ForeignKey('remanga_comment.id'))
+    is_liked = Column(Boolean)
+
+    user = relationship('User', backref='remanga_comment_rating')
+    title = relationship('Title', backref='remanga_comment_rating')
+    comment = relationship('Comment', backref='remanga_comment_rating')
+
+schemas
+
+class Comment_rating(BaseModel):
+    id: int
+    user_id: int 
+    title_id: int 
+    comment_id: int 
+    is_liked: bool
+
+словарь из оцененный коментов comment_id: is_liked
+Чтобы не проходить по всем коментариям O(2n) списка, а по словарю
+
+comments_ratings = {}
+
+user_title_comments_ratings = db.query(Comment_rating).filter(Comment_rating.user_id == user.id, Comment_rating.title_id == title.id).all()
+
+for comment_rating in user_title_comments_ratings:
+    comments_ratings[comment_rating.comment_id] = comment_rating.is_liked
+
+
+В template если комент.id есть в словаре, если true то like, false dislike,
+если нет в словаре, то нет оценки.
+
+{% if comment.id in comments_ratings %}
+    {% if comments_ratings[comment.id] %}
+        like
+    {% else %}
+        dislike
+    {% endif %}
+{% else %}
+    нет оценки
+{% endif %}
 
 -------------------------------------------
 
@@ -97,7 +150,7 @@ QA Automation Selenium, Bash, Web-UI, API
 -------------------------------------------
 
 Пароль у акков fsafsafzcx
-cd .\remanga_fastapi\src\
+cd .\remanga_fastapi\src
 python -m uvicorn main:app --reload
 
 python -m alembic revision --autogenerate -m "init"

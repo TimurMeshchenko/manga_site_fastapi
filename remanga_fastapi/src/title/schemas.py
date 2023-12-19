@@ -9,8 +9,9 @@ class Genres(BaseModel):
     id: int
     name: str
     
-class Chapters(BaseModel):
+class Title_chapters(BaseModel):
     id: int
+    title_id: int
     chapter: int
     tome: int
 
@@ -36,10 +37,17 @@ class Title(BaseModel):
     count_bookmarks: int = 0
     count_chapters: int
     description: str
+    
     categories: list[Categories]
     genres: list[Genres]
-    chapters: list[Chapters]
+    chapters: list[Title_chapters]
     comments: list[Comment] = []
     
     class Config:
         from_attributes = True
+
+class Title_rating(BaseModel):
+    id: int
+    user_id: int
+    title_id: int
+    rating: int

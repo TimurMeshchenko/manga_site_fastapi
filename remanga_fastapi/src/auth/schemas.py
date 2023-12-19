@@ -10,11 +10,6 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     username: str | None = None
 
-class Rating(BaseModel):
-    id: int
-    title_id: int 
-    rating: int = 0
-
 class Title_comments_ratings(BaseModel):
     id: int
     title_id: int
@@ -37,8 +32,8 @@ class User(BaseModel):
     is_active: bool
     date_joined: datetime
     avatar: str
-    titles: list[Title] = []
-    ratings: list[Rating] = []
+
+    bookmarks: list[Title] = []
     titles_comments_ratings: list[Title_comments_ratings] = []
 
     class Config:

@@ -94,7 +94,7 @@ def is_invalid_password(password):
     return re.match(password_pattern, password) is None
 
 def set_context_and_cookie_csrf_token(templates: Jinja2Templates, context: dict, template_name: str):
-    csrf_token = secrets.token_hex(32)
+    csrf_token = generate_csrf_token()
 
     context["csrf_token"] = csrf_token
 
@@ -102,6 +102,9 @@ def set_context_and_cookie_csrf_token(templates: Jinja2Templates, context: dict,
     response.set_cookie(key="csrf_token", value=csrf_token, httponly=True, samesite="Strict")    
 
     return response
+
+def generate_csrf_token():
+    return secrets.token_hex(32)
 
 def validate_csrf(request: Request):
     csrf_token_cookies = request.cookies.get("csrf_token")

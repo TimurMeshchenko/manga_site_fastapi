@@ -2789,22 +2789,22 @@
             </div>
             <div>
                 <div class="Grid_grid__XU5Pz Library_grid__L5DwR">
-                    {% for title in titles %}
-                    <div class="Grid_gridItem__aPUx1 p-1"><a title="{{ title.rus_name }}" class="Library_card__87Skx"
-                            href="{{ url_for('remanga:title', dir_name=title.dir_name) }}">
+                    {% for bookmark in bookmarks %}
+                    <div class="Grid_gridItem__aPUx1 p-1"><a title="{{ bookmark.rus_name }}" class="Library_card__87Skx"
+                            href="{{ url_for('remanga:title', dir_name=bookmark.dir_name) }}">
                             <div class="Library_wrapper__MWbWz">
                                 <div
                                     class="Image_container__z9DC9 Image_hover__3aJFw rounded-sm Library_img__ASP_l Image_imagePlaceholder__7plww">
                                     <div class="Image_imgStatic__qYXY7 Image_image__85Rxf Image_imgFluid__7ygPD Image_lazyLoaded__LVajX"
-                                        alt="Обложка произведения {{ title.rus_name }}"
-                                        style="background-image: url('/media/titles/{{ title.img_url }}');">
+                                        alt="Обложка произведения {{ bookmark.rus_name }}"
+                                        style="background-image: url('/media/titles/{{ bookmark.img_url }}');">
                                     </div>
                                 </div>
                             </div>
                             <div class="Library_cardTitle__AgujO Library_unreadFree__ZWBJg">
                                 <h4
                                     class="Typography_h6__VMBDX Typography_lineClamp-2__A03jO Typography_lineClamp__Pa1wi">
-                                    {{ title.rus_name }}</h4>
+                                    {{ bookmark.rus_name }}</h4>
                             </div>
                         </a>
                     </div>
@@ -2825,69 +2825,15 @@
     </main>
 </div>
 
-<script src="{{ url_for('static', path='title/js/requests_post/bookmark_post.js') }}"></script>
+<script src="{{ url_for('static', path='title/js/websockets/websockets_bookmark.js') }}"></script>
+<script src="{{ url_for('static', path='bookmarks/websockets_bookmarks.js') }}"></script>
 <script>
     const user_id = "{{ user.id }}";
+    const url_title_empty = "{{ url_for('remanga:title', dir_name=0) }}"
+    const title_id = "0"
     const session_id = generate_session_id();
     const ws = new WebSocket(`ws://localhost:8000/ws/${session_id}`);
-    
-    ws.onmessage = function (event) {
-        const response = JSON.parse(event.data);
-        const is_onopen = response.title_rus_name == null;
-        
-        if (is_onopen) return;
 
-        if (response.is_bookmark_added) {
-            const last_title_element = get_last_title_element();
-
-            add_title(last_title_element, response)
-            
-            const updated_last_title_element = get_last_title_element();
-            const last_title_element_a = updated_last_title_element.querySelector("a");
-    
-            last_title_element_a.href = last_title_element_a.href.slice(0, -1) + response.title_dir_name;
-        }
-        else
-            remove_removed_bookmark_title(response)
-    };    
-
-    function get_last_title_element() {
-        const all_titles = document.querySelectorAll(".Grid_gridItem__aPUx1");
-        const last_title_element = all_titles[all_titles.length - 1];
-
-        return last_title_element;
-    }
-
-    function add_title(last_title_element, response) {
-        last_title_element.insertAdjacentHTML("afterend", `
-        <div class="Grid_gridItem__aPUx1 p-1"><a title="${response.title_rus_name}" class="Library_card__87Skx"
-            href="{{ url_for('remanga:title', dir_name=0) }}">
-            <div class="Library_wrapper__MWbWz">
-                <div
-                    class="Image_container__z9DC9 Image_hover__3aJFw rounded-sm Library_img__ASP_l Image_imagePlaceholder__7plww">
-                    <div class="Image_imgStatic__qYXY7 Image_image__85Rxf Image_imgFluid__7ygPD Image_lazyLoaded__LVajX"
-                        alt="Обложка произведения ${response.title_rus_name}"
-                        style="background-image: url('/media/titles/${response.title_img_url}');">
-                    </div>
-                </div>
-            </div>
-            <div class="Library_cardTitle__AgujO Library_unreadFree__ZWBJg">
-                <h4
-                    class="Typography_h6__VMBDX Typography_lineClamp-2__A03jO Typography_lineClamp__Pa1wi">
-                    ${response.title_rus_name}</h4>
-            </div>
-        </a>
-        </div>
-        `);
-    }
-
-    function remove_removed_bookmark_title(response) {
-        const titles_a_elements = document.querySelectorAll(".Library_card__87Skx"); 
-        
-        for (title_a_element of titles_a_elements) {
-            if (title_a_element.title == response.title_rus_name)
-                title_a_element.parentElement.remove();
-        }
-    }
+    listen_websocket_response();
 </script>
 {% endblock %}

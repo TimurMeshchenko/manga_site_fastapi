@@ -16,18 +16,6 @@ remanga_title_genres = Table('remanga_title_genres', Base.metadata,
     Column('genres_id', BigInteger, ForeignKey('remanga_genres.id'))
 )
 
-remanga_title_chapters = Table('remanga_title_chapters', Base.metadata,
-    Column('id', BigInteger, primary_key=True),                               
-    Column('title_id', BigInteger, ForeignKey('remanga_title.id')),
-    Column('chapters_id', BigInteger, ForeignKey('remanga_chapters.id'))
-)
-
-remanga_title_comments = Table('remanga_title_comments', Base.metadata,
-    Column('id', BigInteger, primary_key=True),
-    Column('title_id', BigInteger, ForeignKey('remanga_title.id')),
-    Column('comment_id', BigInteger, ForeignKey('remanga_comment.id'))
-)
-
 class Genres(Base):
     __tablename__ = 'remanga_genres'
 
@@ -40,23 +28,18 @@ class Categories(Base):
     id = Column(BigInteger, primary_key=True)
     name = Column(String(100), default='')
 
-class Chapters(Base):
-    __tablename__ = 'remanga_chapters'
-
-    id = Column(BigInteger, primary_key=True)
-    chapter = Column(Integer, default=0)
-    tome = Column(Integer, default=0)
-
 class Comment(Base):
     __tablename__ = 'remanga_comment'
 
     id = Column(Integer, primary_key=True)
     author_id = Column(BigInteger, ForeignKey('user.id'))
+    title_id = Column(BigInteger, ForeignKey('remanga_title.id'))
     content = Column(Text)
     created_at = Column(TIMESTAMP(timezone=True), default=func.now())
     likes = Column(Integer, default=0)
 
     author = relationship('User', backref='remanga_comment')
+    title = relationship('Title', back_populates='comments')
 
 class Title(Base):
     __tablename__ = 'remanga_title'
@@ -75,5 +58,27 @@ class Title(Base):
 
     categories = relationship('Categories', secondary=remanga_title_categories, backref='remanga_title')
     genres = relationship('Genres', secondary=remanga_title_genres, backref='remanga_title')
-    chapters = relationship('Chapters', secondary=remanga_title_chapters, backref='remanga_title')
-    comments = relationship('Comment', secondary=remanga_title_comments, backref='remanga_title')
+    chapters = relationship('Title_chapters', back_populates="title")
+    comments = relationship('Comment', back_populates='title')
+
+
+class Title_chapters(Base):
+    __tablename__ = 'remanga_title_chapters'
+
+    id = Column(BigInteger, primary_key=True)
+    title_id = Column(BigInteger, ForeignKey('remanga_title.id'))
+    chapter = Column(Integer, default=0)
+    tome = Column(Integer, default=0)
+
+    title = relationship('Title', back_populates='chapters')
+
+class Title_rating(Base):
+    __tablename__ = 'remanga_title_rating'
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(BigInteger, ForeignKey('user.id'))
+    title_id = Column(BigInteger, ForeignKey('remanga_title.id'))
+    rating = Column(Integer)
+
+    user = relationship('User', backref='remanga_title_rating')
+    title = relationship('Title', backref="remanga_title_rating")
