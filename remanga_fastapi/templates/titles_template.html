@@ -1,7 +1,7 @@
 {% for title in titles_list %}
-
 <div class="gridItem">
-    <a title="{{ title.rus_name }}" class="Vertical_card__Sxft_" href="{% url 'remanga:title' title.dir_name %}">
+    <a title="{{ title.rus_name }}" class="Vertical_card__Sxft_"
+        href="{{ url_for('remanga:title', dir_name=title.dir_name) }}">
         <div class="Vertical_wrapper__eThs_">
             <div
                 class="Image_container__NpLCh Image_hover__XbAZP rounded-md Vertical_img__vaURH Image_imagePlaceholder__oa9r1">
@@ -10,7 +10,7 @@
                     alt="Обложка произведения {{ title.rus_name }}"></div>
             </div>
             <div class="Vertical_rating__nY5Rc">
-                {{ title.avg_rating|floatformat:1 }}
+                {{ title.avg_rating|float|round(1) }}
             </div>
             <div class="Horizontal_title_info">
                 <p class="Typography_caption__yY5RL">
@@ -23,5 +23,4 @@
         </div>
     </a>
 </div>
-
 {% endfor %}

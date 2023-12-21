@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger, Float, Table, Text, TIMESTAMP
+from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger, Float, Table, Text, TIMESTAMP, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -27,19 +27,6 @@ class Categories(Base):
 
     id = Column(BigInteger, primary_key=True)
     name = Column(String(100), default='')
-
-class Comment(Base):
-    __tablename__ = 'remanga_comment'
-
-    id = Column(Integer, primary_key=True)
-    author_id = Column(BigInteger, ForeignKey('user.id'))
-    title_id = Column(BigInteger, ForeignKey('remanga_title.id'))
-    content = Column(Text)
-    created_at = Column(TIMESTAMP(timezone=True), default=func.now())
-    likes = Column(Integer, default=0)
-
-    author = relationship('User', backref='remanga_comment')
-    title = relationship('Title', back_populates='comments')
 
 class Title(Base):
     __tablename__ = 'remanga_title'
@@ -82,3 +69,29 @@ class Title_rating(Base):
 
     user = relationship('User', backref='remanga_title_rating')
     title = relationship('Title', backref="remanga_title_rating")
+
+class Comment(Base):
+    __tablename__ = 'remanga_comment'
+
+    id = Column(Integer, primary_key=True)
+    author_id = Column(BigInteger, ForeignKey('user.id'))
+    title_id = Column(BigInteger, ForeignKey('remanga_title.id'))
+    content = Column(Text)
+    created_at = Column(TIMESTAMP(timezone=True), default=func.now())
+    likes = Column(Integer, default=0)
+
+    author = relationship('User', backref='remanga_comment')
+    title = relationship('Title', back_populates='comments')
+
+class Comment_rating(Base):
+    __tablename__ = 'remanga_comment_rating'
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(BigInteger, ForeignKey('user.id'))
+    title_id = Column(BigInteger, ForeignKey('remanga_title.id'))
+    comment_id = Column(BigInteger, ForeignKey('remanga_comment.id'))
+    is_liked = Column(Boolean)
+
+    user = relationship('User', backref='remanga_comment_rating')
+    title = relationship('Title', backref='remanga_comment_rating')
+    comment = relationship('Comment', backref='remanga_comment_rating')    

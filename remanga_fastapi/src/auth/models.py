@@ -3,39 +3,11 @@ from sqlalchemy.orm import relationship
 
 from database import Base
 
-remanga_title_comments_ratings_comments_likes = Table('remanga_title_comments_ratings_comments_likes', Base.metadata,
-    Column('id', BigInteger, primary_key=True),                             
-    Column('title_comments_ratings_id', BigInteger, ForeignKey('remanga_title_comments_ratings.id')),
-    Column('comment_id', BigInteger, ForeignKey('remanga_comment.id'))
-)
-
-remanga_title_comments_ratings_comments_dislikes = Table('remanga_title_comments_ratings_comments_dislikes', Base.metadata,
-    Column('id', BigInteger, primary_key=True),                             
-    Column('title_comments_ratings_id', BigInteger, ForeignKey('remanga_title_comments_ratings.id')),
-    Column('comment_id', BigInteger, ForeignKey('remanga_comment.id'))
-)
-
 user_bookmarks = Table('user_bookmarks', Base.metadata,
     Column('id', BigInteger, primary_key=True),                             
     Column('user_id', BigInteger, ForeignKey('user.id')),
     Column('title_id', BigInteger, ForeignKey('remanga_title.id'))
 )
-
-user_titles_comments_ratings = Table('user_titles_comments_ratings', Base.metadata,
-    Column('id', BigInteger, primary_key=True),                             
-    Column('user_id', BigInteger, ForeignKey('user.id')),
-    Column('title_comments_ratings_id', BigInteger, ForeignKey('remanga_title_comments_ratings.id'))
-)
-
-class Title_comments_ratings(Base):
-    __tablename__ = 'remanga_title_comments_ratings'
-
-    id = Column(BigInteger, primary_key=True)
-    title_id = Column(Integer, ForeignKey('remanga_title.id'))
-
-    title = relationship('Title', backref='remanga_title_comments_ratings')
-    comments_likes = relationship('Comment', secondary=remanga_title_comments_ratings_comments_likes, backref='comments_likes')
-    comments_dislikes = relationship('Comment', secondary=remanga_title_comments_ratings_comments_dislikes, backref='comments_dislikes')
 
 class User(Base):
     __tablename__ = 'user'
@@ -54,4 +26,3 @@ class User(Base):
     avatar = Column(String(100), default='')
 
     bookmarks = relationship('Title', secondary=user_bookmarks, backref='user')
-    titles_comments_ratings = relationship('Title_comments_ratings', secondary=user_titles_comments_ratings, backref='user')

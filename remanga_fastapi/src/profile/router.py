@@ -1,13 +1,14 @@
-from fastapi import APIRouter, Depends, Request, Response
+from fastapi import APIRouter, Depends, Request, Response, UploadFile, HTTPException, status
 from fastapi.templating import Jinja2Templates
 from typing import Annotated
 from sqlalchemy.orm import Session
 
 from config import get_db
-from auth.schemas import User as schemas_User 
+from auth.schemas import User as schemas_User, UserChangePassword 
 from auth.dependencies import get_current_user
-from auth.utils import set_context_and_cookie_csrf_token, validate_csrf
+from auth.utils import set_context_and_cookie_csrf_token, validate_csrf, verify_password, is_invalid_password, get_password_hash
 from auth.models import User as models_User
+from auth.exceptions import different_passwords, invalid_password
 
 router = APIRouter(tags=["profile"])
 
@@ -31,3 +32,51 @@ def delete_cookie(response: Response):
     response.headers["Location"] = "/"
     response.status_code = 302
     return response
+
+@router.post("/api/change_avatar")
+async def change_avatar(
+    request: Request, 
+    avatar: UploadFile,
+    current_user: Annotated[schemas_User, Depends(get_current_user)],
+    db: Session = Depends(get_db)
+):
+    validate_csrf(request)
+    
+    if avatar.content_type not in ["image/jpeg", "image/png", "image/gif"]:
+        raise HTTPException(status_code=400, detail="Invalid file type")
+
+    file_name = f"{current_user.id}.jpg"
+    file_path = f"media/users_avatars/{file_name}" 
+
+    with open(file_path, "wb") as f:
+        f.write(await avatar.read())
+    
+    current_user.avatar = file_name
+
+    db.commit()
+
+    return {"message": "Successfuly uploaded"}
+
+@router.post("/api/change_password")
+async def change_password(
+    request: Request, 
+    passwords: UserChangePassword,
+    current_user: Annotated[schemas_User, Depends(get_current_user)],
+    db: Session = Depends(get_db)
+):
+    validate_csrf(request)
+
+    if (not verify_password(passwords.old_password, current_user.password)):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Old password is incorrect'
+        )
+    
+    if passwords.new_password != passwords.new_password2: different_passwords()
+    if is_invalid_password(passwords.new_password): invalid_password()
+
+    current_user.password = get_password_hash(passwords.new_password)
+
+    db.commit()
+
+    return {"message": "Password successfuly changed"}

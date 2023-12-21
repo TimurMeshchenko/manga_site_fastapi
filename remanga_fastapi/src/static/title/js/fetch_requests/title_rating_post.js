@@ -7,7 +7,12 @@ class Title_rating_post {
         this.body = document.querySelector("body");
 
         this.update_data_callback = (response) => {
-            this.update_data(response)
+            const is_error = 'detail' in response; 
+        
+            if (is_error)
+                location.reload();
+            else
+                this.update_data(response)
         };
     }
     

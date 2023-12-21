@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 
-from title.schemas import Comment, Title
+from title.schemas import Title
 
 class Token(BaseModel):
     access_token: str
@@ -9,15 +9,6 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: str | None = None
-
-class Title_comments_ratings(BaseModel):
-    id: int
-    title_id: int
-    comments_likes: list[Comment] = []
-    comments_dislikes: list[Comment] = []
-
-    class Config:
-        from_attributes = True
 
 class User(BaseModel):
     id: int
@@ -34,7 +25,6 @@ class User(BaseModel):
     avatar: str
 
     bookmarks: list[Title] = []
-    titles_comments_ratings: list[Title_comments_ratings] = []
 
     class Config:
         from_attributes = True
@@ -48,3 +38,8 @@ class UserSignup(BaseModel):
 class UserSignin(BaseModel):
     username: str
     password: str
+
+class UserChangePassword(BaseModel):
+    old_password: str
+    new_password: str
+    new_password2: str

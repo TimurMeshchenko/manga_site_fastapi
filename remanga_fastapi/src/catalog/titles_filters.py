@@ -35,7 +35,7 @@ class Titles_filters:
         for query_key in list(request.query_params.keys()): 
             query_values = request.query_params.getlist(query_key)
             
-            if (''.join(query_values) == str() or query_key == 'next_page'): continue
+            if (''.join(query_values) == str() or query_key == 'page'): continue
             
             self.create_query_key_filters(query_key, query_values)        
             

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
+from sqlalchemy import desc
 from sqlalchemy.orm import Session
-from fastapi.encoders import jsonable_encoder
 from typing import Annotated
 
 from . import utils, models, titles_filters
@@ -17,25 +17,27 @@ router = APIRouter(tags=["catalog"])
 
 templates = Jinja2Templates(directory="../templates")
 
+titles = None
+
 @router.get("/", name="remanga:catalog")
 async def catalog(request: Request, current_user: Annotated[User, Depends(get_current_user)], 
                   db: Session = Depends(get_db)):
-    titles = db.query(Title)
-    context = {}
+    global titles
+
+    if not titles: 
+        titles = db.query(Title).order_by(desc(Title.count_rating))
+
+    filtered_titles = titles
+    page = request.query_params.get("page")
 
     titles_filters_object = titles_filters.Titles_filters(db)    
     filters = titles_filters_object.create_filters(request)    
 
-    if not filters is None: titles = titles.filter(filters)
-        
-    database_tables_data = utils.get_database_tables_data(db)
-    
-    for database_table_data_key in database_tables_data:
-        context[database_table_data_key] = jsonable_encoder(database_tables_data[database_table_data_key])
+    if not filters is None: filtered_titles = titles.filter(filters)
 
+    if (page): return utils.get_next_page_data(filtered_titles, request, templates, page)
+      
+    context = utils.get_context(filtered_titles, current_user, db)
     context["request"] = request
-    context["user"] = current_user
-    context["titles_list"] = titles.all()
 
     return templates.TemplateResponse("catalog.html", context)
-

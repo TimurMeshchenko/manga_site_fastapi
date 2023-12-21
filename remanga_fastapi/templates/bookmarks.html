@@ -2825,13 +2825,15 @@
     </main>
 </div>
 
+<script src="{{ url_for('static', path='title/js/websockets/websockets_title.js') }}"></script>
 <script src="{{ url_for('static', path='title/js/websockets/websockets_bookmark.js') }}"></script>
 <script src="{{ url_for('static', path='bookmarks/websockets_bookmarks.js') }}"></script>
 <script>
     const user_id = "{{ user.id }}";
     const url_title_empty = "{{ url_for('remanga:title', dir_name=0) }}"
     const title_id = "0"
-    const session_id = generate_session_id();
+    
+    const session_id = Websockets_title.generate_session_id();
     const ws = new WebSocket(`ws://localhost:8000/ws/${session_id}`);
 
     listen_websocket_response();

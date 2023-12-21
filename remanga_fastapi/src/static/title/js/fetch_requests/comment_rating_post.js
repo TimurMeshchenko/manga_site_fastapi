@@ -1,32 +1,47 @@
-class Comment_rating_post extends Ajax_post {
-    constructor() {
-        super();
-        
-        const comment_rating_form_class = ".comment_like_form";
+class Comment_rating_post {
+    constructor() {        
         this.comment_rating_colors = ['SvgIcon_color-primary__TnNB7', 'SvgIcon_color-secondary__OvK95'];
 
-        $(comment_rating_form_class).click((event) => this.set_comment_rating_element(event));
-        this.Form_submit(comment_rating_form_class)
-
         this.update_data_callback = (response) => {
-            this.update_data(response)
+            const is_error = 'detail' in response; 
+        
+            if (is_error)
+                location.reload();
+            else
+                this.update_data(response)
         };
+
+        this.listen_buttons_comments_ratings()
     }
     
-    set_comment_rating_element(event) {
-        const button_comment_rating = event.target.tagName == "path" ? 
-            event.target.parentNode.parentNode : event.target.parentNode;
+    listen_buttons_comments_ratings() {
+        const buttons_comments_ratings = document.querySelectorAll('.Button_comment_rating');
 
-        this.comment_rating_element = button_comment_rating;
+        for (const button_comment_rating of buttons_comments_ratings)
+            this.listen_button_comment_rating(button_comment_rating)
     }
 
-    Form_submit(form_class) {
-        $(form_class).submit((event) => {
-            const formData = new FormData($(event.target)[0]);
+    listen_button_comment_rating(button_comment_rating) {
+        button_comment_rating.addEventListener('click', (event) => { 
+            if (!user_id) return window.location.href = "/signin";
+            
+            this.set_comment_rating_element(event)
+            
+            const fetch_data = JSON.stringify({
+                action: this.comment_rating_element.value,
+            })
 
-            formData.append('form_name', this.comment_rating_element.value);  
-            super.Post_request(event, formData, this.update_data_callback)
+            fetch_request("/api/comment_rating", fetch_data, csrf_token, this.update_data_callback)
         });
+    }
+
+    set_comment_rating_element(event) {
+        let button_comment_rating = event.target.tagName == "path" ? 
+            event.target.parentNode.parentNode : event.target.parentNode;
+
+        button_comment_rating = event.target.tagName == "BUTTON" ? event.target : button_comment_rating;
+
+        this.comment_rating_element = button_comment_rating;
     }
 
     update_data(response) {

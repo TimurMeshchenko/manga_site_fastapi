@@ -665,7 +665,7 @@
       <div class="jsx-2a8f39a92d173359 Header_navContainer__3fCGy flexAuto">
         <div style="max-width: 300px" class="jsx-2a8f39a92d173359 hidden-smDown Header_navContainer__3fCGy ml16">
           <a class="Button_button__JOS9_ Header_headerLink__EvjUK hidden-mdDown" tabindex="0" role="button"
-            href="">
+            href="{{ url_for('remanga:search') }}">
             Поиск</a>
           <a class="Button_button__JOS9_ Header_headerLink__EvjUK" tabindex="0" role="button"
             href="{{ url_for('remanga:catalog') }}">Каталог</a>
@@ -688,7 +688,7 @@
         <div class="Avatar_avatar__hG0bH Avatar_colorDefault__MHL29 jsx-88620ec3676b2b4a">
           <a href="{{ url_for('remanga:profile', user_id=user.id) }}">
             {% if user.avatar %}
-            <img class="profile-pic" src="/media/{{ user.avatar }}" style="width: 100%;">
+            <img class="profile-pic" src="/media/users_avatars/{{ user.avatar }}" style="width: 100%;">
             {% else %}
             <img class="profile-pic" src='/media/users_avatars/no_avatar.jpg' style="width: 100%;">
             {% endif %}
@@ -1059,7 +1059,11 @@
   <script src="{{ url_for('static', path='catalog/js/filters/input_range_filters/input_range_filters.js') }}"></script>
   <script src="{{ url_for('static', path='catalog/js/filters/chapters_filters/chapters_filters.js') }}"></script>
     
+  <script src="{{ url_for('static', path='catalog/js/endless_scroll.js') }}"></script>
+
   <script>
+    const pages_count = "{{ pages_count }}";
+    
     let data_array = [
       "{{ types_data }}",
       "{{ genres_data }}",
@@ -1067,6 +1071,7 @@
     ]
 
     new Filters().main(data_array)
+    new Endless_scroll();
   </script>
 
   <next-route-announcer>

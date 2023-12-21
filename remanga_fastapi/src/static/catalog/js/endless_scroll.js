@@ -1,36 +1,24 @@
 class Endless_scroll {
-    constructor(num_pages) {
-        this.page = 1;
-
+    constructor() {
+        this.page = 0;
         this.grid = document.querySelector(".grid");
         this.gridPlaceholder = this.grid.querySelector(".gridPlaceholder");
 
-        this.listen_scroll(Number(num_pages));
+        this.listen_scroll();
     }
 
-    listen_scroll(num_pages) {
+    listen_scroll() {
         window.addEventListener('scroll', () => {
-            const is_not_all_titles_loaded = this.page < num_pages;
-            
-            if (this.is_last_title_scrolled() && is_not_all_titles_loaded)
+            const is_not_all_titles_loaded = this.page < pages_count;
+
+            if (this.gridPlaceholder && this.is_last_title_scrolled() && is_not_all_titles_loaded)
                 this.load_more_titles_post()
         });
     }
 
     load_more_titles_post() {
         this.page++;
-        
-        $.ajax({
-            url: window.location.href,
-            type: 'GET',
-            dataType: 'json',
-            data: {
-                next_page: this.page
-            },
-            success: (response) => {
-                this.gridPlaceholder.insertAdjacentHTML("beforebegin", response.html);
-            }
-        });
+        this.add_titles_page();
     }
 
     is_last_title_scrolled() {
@@ -41,5 +29,13 @@ class Endless_scroll {
       const height_from_last_title_to_end = last_title.offsetHeight + footer.offsetHeight;
       
       return scrolledHeight + height_from_last_title_to_end >= document.documentElement.scrollHeight;
-    }    
+    }   
+
+    async add_titles_page() {
+        const query_symbol = window.location.href.includes("?") ? "&" : "?";
+        const response = await fetch(`${window.location.href}${query_symbol}page=${this.page}`);
+        const data = await response.json();
+        
+        this.gridPlaceholder.insertAdjacentHTML("beforebegin", data);
+    }
 }

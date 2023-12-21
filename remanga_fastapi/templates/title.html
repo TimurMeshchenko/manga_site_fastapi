@@ -853,7 +853,7 @@
                 <div class="jsx-525f9ca96b40a0e6 buttons">
                     <button
                       class="Button_button__JOS9_ Button_button__JOS9_ Button_contained__C0zVd Button_contained-primary__ZtvzA Button_fullWidth__iQYat Button_bookmark"
-                      tabindex="0" style="font-weight: 600; border-radius: 8px" onclick="listen_bookmark_button()">
+                      tabindex="0" style="font-weight: 600; border-radius: 8px">
                       <span class="Button_label__py8bK"><span
                           class="Button_startIcon__LY2Am Button_icon-size-medium__SLolh"><span style="width: 16px"
                             class="jsx-525f9ca96b40a0e6"></span></span>
@@ -994,7 +994,7 @@
                         <div class="jsx-3914328852 Comments_media__5h5tS">
                           <a href="">
                             {% if comment.author.avatar %}
-                            <img src="/media/{{ comment.author.avatar }}" alt="..."
+                            <img src="/media/users_avatars/{{ comment.author.avatar }}" alt="..."
                               class="jsx-3914328852 Comments_mediaAvatar__IuIbH" />
                             {% else %}
                             <img src="/media/users_avatars/no_avatar.jpg" alt="..." 
@@ -1015,26 +1015,27 @@
                               </div>
                             </div>
                             <div class="jsx-3914328852 Comments_footer__4u_24 flex items-center">
-                              <form method="post" class="comment_like_form">
-                                  <button class="Comments_iconButton__dwH2e" type="submit" name="form_name" value="like_{{ comment.id }}" style="background-color: transparent;border: none;padding: 0;">
-                                    {% if comment in title_comments_ratings.comments_likes %}
-                                      <svg fill="currentColor" viewBox="0 0 40 40" class="jsx-83d2bca1a5644a9 jsx-2719031823 SvgIcon_fontSize-small__i__5t SvgIcon_color-primary__TnNB7 Svg_rating">
-                                        <path
-                                          d="M31 26.4q0 .3-.2.5l-1.1 1.2q-.3.2-.6.2t-.5-.2l-8.7-8.8-8.8 8.8q-.2.2-.5.2t-.5-.2l-1.2-1.2q-.2-.2-.2-.5t.2-.5l10.4-10.4q.3-.2.6-.2t.5.2l10.4 10.4q.2.2.2.5z"
-                                          class="jsx-83d2bca1a5644a9 jsx-2719031823"></path>
-                                      </svg>
+                              <form class="comment_like_form">
+                                  <button class="Comments_iconButton__dwH2e Button_comment_rating" type="button" value="like_{{ comment.id }}" style="background-color: transparent;border: none;padding: 0;">                                                                
+                                      {% if user_title_comments_ratings[comment.id] %}
+                                        <svg fill="currentColor" viewBox="0 0 40 40"
+                                          class="jsx-83d2bca1a5644a9 jsx-2719031823 SvgIcon_fontSize-small__i__5t SvgIcon_color-primary__TnNB7 Svg_rating">
+                                          <path
+                                            d="M31 26.4q0 .3-.2.5l-1.1 1.2q-.3.2-.6.2t-.5-.2l-8.7-8.8-8.8 8.8q-.2.2-.5.2t-.5-.2l-1.2-1.2q-.2-.2-.2-.5t.2-.5l10.4-10.4q.3-.2.6-.2t.5.2l10.4 10.4q.2.2.2.5z"
+                                            class="jsx-83d2bca1a5644a9 jsx-2719031823"></path>
+                                        </svg>
                                       {% else %}
                                       <svg fill="currentColor" viewBox="0 0 40 40" class="jsx-83d2bca1a5644a9 jsx-2719031823 SvgIcon_fontSize-small__i__5t Svg_rating">
                                         <path
                                           d="M31 26.4q0 .3-.2.5l-1.1 1.2q-.3.2-.6.2t-.5-.2l-8.7-8.8-8.8 8.8q-.2.2-.5.2t-.5-.2l-1.2-1.2q-.2-.2-.2-.5t.2-.5l10.4-10.4q.3-.2.6-.2t.5.2l10.4 10.4q.2.2.2.5z"
                                           class="jsx-83d2bca1a5644a9 jsx-2719031823"></path>
                                       </svg>
-                                    {% endif %}        
+                                      {% endif %}
                                   </button>
                                 <span class="Comments_score__fxIQG"> {{ comment.likes }} </span>
-                                <button class="Comments_iconButton__dwH2e" type="submit" name="form_name" value="dislike_{{ comment.id }}"
+                                <button class="Comments_iconButton__dwH2e Button_comment_rating" type="button" value="dislike_{{ comment.id }}"
                                 style="background-color: transparent;border: none;padding: 0;">
-                                {% if comment in title_comments_ratings.comments_dislikes %}
+                                {% if comment.id in user_title_comments_ratings and not user_title_comments_ratings[comment.id] %}
                                   <svg fill="currentColor" viewBox="0 0 40 40"
                                     class="jsx-83d2bca1a5644a9 jsx-2719031823 SvgIcon_fontSize-small__i__5t SvgIcon_color-secondary__OvK95 Svg_rating"
                                     style="transform: rotate(180deg);">
@@ -1042,7 +1043,7 @@
                                       d="M31 26.4q0 .3-.2.5l-1.1 1.2q-.3.2-.6.2t-.5-.2l-8.7-8.8-8.8 8.8q-.2.2-.5.2t-.5-.2l-1.2-1.2q-.2-.2-.2-.5t.2-.5l10.4-10.4q.3-.2.6-.2t.5.2l10.4 10.4q.2.2.2.5z"
                                       class="jsx-83d2bca1a5644a9 jsx-2719031823"></path>
                                   </svg>
-                                    {% else %}                                    
+                                {% else %}                                    
                                   <svg fill="currentColor" viewBox="0 0 40 40" class="jsx-83d2bca1a5644a9 jsx-2719031823 SvgIcon_fontSize-small__i__5t Svg_rating"
                                     style="transform: rotate(180deg);">
                                     <path
@@ -1128,27 +1129,36 @@
 
 <script src="{{ url_for('static', path='title/js/comment_input_stylization.js') }}"></script> 
 <script src="{{ url_for('static', path='title/js/title_menu_switcher.js') }}"></script> 
+
 <script src="{{ url_for('static', path='title/js/fetch_requests/fetch_request.js') }}"></script>
 <script src="{{ url_for('static', path='title/js/fetch_requests/title_rating_post.js') }}"></script>
-<script src="{{ url_for('static', path='title/js/fetch_requests/comment_post.js') }}"></script>
+<script src="{{ url_for('static', path='title/js/fetch_requests/comment_rating_post.js') }}"></script>
+
+<script src="{{ url_for('static', path='title/js/websockets/websockets_title.js') }}"></script>
 <script src="{{ url_for('static', path='title/js/websockets/websockets_bookmark.js') }}"></script>
+<script src="{{ url_for('static', path='title/js/websockets/websockets_comment.js') }}"></script>
 <script>
   const user_id = "{{ user }}" ? "{{ user.id }}" : "";
-  const bookmark_button = user_id ? document.querySelector(".Button_bookmark") : null;
-  const title_count_bookmarks = document.querySelector(".title_count_bookmarks");
   const title_id = "{{ title.id }}";
+  const title_dir_name = "{{ title.dir_name }}";
+  
+  const websockets_title = new Websockets_title();
+  const websockets_types = {
+    "bookmark": new Websockets_bookmark(),
+    "comment": new Websockets_comment()
+  };
 
-  const session_id = generate_session_id();
+  const session_id = Websockets_title.generate_session_id();
   const ws = new WebSocket(`ws://localhost:8000/ws/${session_id}`);
-  let websoket_data = null;
-  let websockets_csrf_token = '';
 
-  handler_websocket_response();
-  listen_websocket_close();
+  websockets_title.handler_websocket_response();
+  websockets_title.listen_websocket_close();
 </script>
 <script>
-  const csrf_token = "{{ csrf_token }}"
+  const csrf_token = "{{ csrf_token }}";
   const title_menu_switcher = new Title_menu_switcher("{{ title_rating }}", "{{ user }}");
+  
+  new Comment_input_stylization();
 
   function add_chapters_menu(description_element) {
     description_element.parentNode.insertAdjacentHTML('beforeend', `  
@@ -1172,12 +1182,5 @@
       </div>
     `);
   }
-</script>
-<script>
-  new Comment_input_stylization();
-</script>
-<script>
-  // const comment_rating_post = new Comment_rating_post();
-  new Comment_post("comment_rating_post", "");
 </script>
 {% endblock %}

@@ -2,9 +2,10 @@ from datetime import datetime, timezone
 from fastapi import WebSocket
 from sqlalchemy.orm import Session
 
-from .models import Title, Title_rating
+from .models import Title, Title_rating, Comment, Comment_rating
 from auth.utils import generate_csrf_token
 from auth.schemas import User
+from auth.models import User as User_model
 
 def timesince(value):
     now = datetime.now(timezone.utc)
@@ -28,12 +29,20 @@ def register_filters(templates):
 def get_title_rating(db: Session, user_id: int, title_id: int):
     return db.query(Title_rating).filter(Title_rating.user_id == user_id, Title_rating.title_id == title_id).first()
 
-def get_title_comments_ratings(current_user, title_id):
-    for title_comments_ratings in current_user.titles_comments_ratings:
-        if title_comments_ratings.title_id == title_id:
-            return title_comments_ratings
-        
-    return None
+def get_user_title_comments_ratings_dict(db: Session, user_id: int, title_id: int):
+    comments_ratings = {}
+    
+    user_title_comments_ratings = db.query(Comment_rating) \
+    .filter(Comment_rating.user_id == user_id, 
+            Comment_rating.title_id == title_id).all()
+
+    for comment_rating in user_title_comments_ratings:
+        comments_ratings[comment_rating.comment_id] = comment_rating.is_liked
+
+    return comments_ratings
+
+def get_title_by_id(db: Session, title_id: int):
+    return db.query(Title).filter(Title.id == title_id).first()
 
 async def set_and_send_websockets_csrf_token(websocket: WebSocket):
     websockets_csrf_token = generate_csrf_token()
@@ -51,6 +60,25 @@ async def is_valid_websocket_csrf(websocket: WebSocket, data):
     
     return True   
 
+async def handler_websockets_bookmark(db: Session, connections: dict, data: dict):
+    user = db.query(User_model).filter(User_model.id == data["user_id"]).first()
+    title = get_title_by_id(db, data["title_id"])
+    is_bookmark_added = title in user.bookmarks
+                
+    await change_bookmark(user, title, is_bookmark_added)
+        
+    db.commit()
+
+    response = {
+        "type": data["type"],
+        "title_rus_name": title.rus_name,
+        "title_dir_name": title.dir_name,
+        "title_img_url": title.img_url,
+        "is_bookmark_added": not is_bookmark_added,
+    }
+
+    await one_user_broadcast(connections, response, user.id)
+
 async def change_bookmark(user: User, title: Title, is_bookmark_added: bool):
     if is_bookmark_added: 
         user.bookmarks.remove(title)
@@ -59,21 +87,43 @@ async def change_bookmark(user: User, title: Title, is_bookmark_added: bool):
         user.bookmarks.append(title)
         title.count_bookmarks += 1
 
-async def title_broadcast(connections: dict, response: dict, title_id: int):
-    for session_id in connections:
-        if session_id.split("-")[1] == str(title_id):
-            await connections[session_id].send_json(response) 
-
 async def one_user_broadcast(connections: dict, response: dict, user_id: int):
     for session_id in connections:
         if session_id.split("-")[0] == str(user_id):
             await connections[session_id].send_json(response) 
 
+async def handler_websockets_comment(db: Session, connections: dict, data: dict):
+    user = db.query(User_model).filter(User_model.id == data["user_id"]).first()
+    title = get_title_by_id(db, data["title_id"])
+
+    max_comment_length = 500
+    comment_content = data["content"][:max_comment_length]
+    comment_object = Comment(author_id=user.id, title_id=title.id, 
+                                                content=comment_content)
+    db.add(comment_object)
+    db.commit()
+                
+    response = {
+        "type": data["type"],
+        "content": comment_content,
+        "user_id": user.id,
+        "user_name": user.username,
+        "user_avatar": user.avatar,
+        "comment_id": comment_object.id
+    }                
+
+    await title_broadcast(connections, response, title.id)
+
+async def title_broadcast(connections: dict, response: dict, title_id: int):
+    for session_id in connections:
+        if session_id.split("-")[1] == str(title_id):
+            await connections[session_id].send_json(response) 
+
 def change_rating(user: User, db: Session, fetch_data: dict):
     rating_str = [letter for letter in fetch_data["title_rating"] if letter.isdigit()]
     rating = int("".join(rating_str)) 
-        
-    title = db.query(Title).filter(Title.id == fetch_data["title_id"]).first()
+    title = get_title_by_id(db, fetch_data["title_id"])
+
     title_rating = get_title_rating(db, user.id, title.id)
     is_same_title_rating_exists = title_rating.rating == rating if title_rating else False 
 
@@ -109,3 +159,57 @@ def add_rating(user: User, title: Title, db: Session, rating: int, is_same_title
     title_rating_object = Title_rating(user_id=user.id, title_id=title.id, rating=rating)
 
     db.add(title_rating_object)
+
+def rating_comment(user: User, db: Session, fetch_data: dict):
+    comment_rating_str = [letter for letter in fetch_data["action"] if letter.isdigit()]
+    comment_rating = int("".join(comment_rating_str)) 
+    comment = db.query(Comment).filter(Comment.id == comment_rating).first()
+
+    comment_rating_object = db.query(Comment_rating).filter(Comment_rating.user_id == user.id, 
+        Comment_rating.title_id == comment.title_id, Comment_rating.comment_id == comment.id).first()    
+    
+    is_same_comment_rating = is_same_comment_rating_exists(comment_rating_object, fetch_data["action"])
+
+    remove_comment_rating(db, comment, comment_rating_object)
+    add_comment_rating(db, comment, fetch_data["action"], user.id, is_same_comment_rating)
+
+    db.commit()
+
+    response = {
+        'comment_likes': comment.likes,
+        'comment_rating': None if is_same_comment_rating else fetch_data["action"]
+    }
+
+    return response
+
+def is_same_comment_rating_exists(comment_rating_object: Comment_rating, action: str):
+    if comment_rating_object:
+        return not comment_rating_object.is_liked if 'dislike' in action else comment_rating_object.is_liked
+    
+    return False
+
+def remove_comment_rating(db: Session, comment: Comment, comment_rating_object: Comment_rating):    
+    if not comment_rating_object: return
+        
+    if comment_rating_object.is_liked:
+        comment.likes -= 1
+    else:
+        comment.likes += 1
+
+    db.delete(comment_rating_object)    
+
+def add_comment_rating(db: Session, comment: Comment, action: str, user_id: int, is_same_comment_rating: bool):
+    if (is_same_comment_rating): return
+
+    is_liked = False
+
+    if 'dislike' in action:
+        comment.likes -= 1
+    else:
+        comment.likes += 1
+        is_liked = True   
+    
+    comment_rating_object = Comment_rating(user_id=user_id, title_id=comment.title_id, comment_id=comment.id, is_liked=is_liked)
+
+    db.add(comment_rating_object)    
+        

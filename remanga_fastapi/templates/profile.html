@@ -4914,6 +4914,10 @@
   .form.jsx-906c1143844456b1>div {
     margin-bottom: 16px
   }
+  .exceptions {
+    color: red;
+  }
+
 </style>
 <style id="__jsx-1493564698">
   html {
@@ -4937,14 +4941,20 @@
               <div
                 class="Avatar_avatar__hG0bH Avatar_colorDefault__MHL29 Profile_editable__WH_yD Profile_avatar__dAlS6">
                 {% if profile.avatar %}
-                <img class="profile-pic" src="/media/{{ profile.avatar }}" style="width: 100%;">
+                <img class="profile-pic" src="/media/users_avatars/{{ profile.avatar }}" style="width: 100%;">
                 {% else %}
                   <img class="profile-pic" src='/media/users_avatars/no_avatar.jpg' style="width: 100%;">
                 {% endif %}
-              </div>
-              
+              </div>     
               {% if user.username == profile.username %}
                 <input type="file" name="avatar" accept="image/*" id="id_avatar" style="display: none;">
+                <script src="{{ url_for('static', path='title/js/fetch_requests/fetch_request.js') }}"></script>
+                <script src="{{ url_for('static', path='profile/profile_avatar_post.js') }}"></script>      
+                <script src="{{ url_for('static', path='profile/password_post.js') }}"></script>
+                <script>
+                  const csrf_token = "{{ csrf_token }}";
+                  new Profile_avatar_post();   
+                </script>
               {% endif %}
             </form>
           </div>
@@ -4971,7 +4981,7 @@
             <div class="jsx-261496919888b024 root fullWidth Input_formControl__B11lU">
               <div class="Input_root___0KQ3 Input_outlined__GjuSL">
                 <input aria-invalid="false" name="new_password1" placeholder="Новый пароль" rows="1" type="password"
-                  class="Input_input___YBKm" value="" id="id_new_password1">
+                  class="Input_input___YBKm" value="" id="id_new_password">
               </div>
               <p class="Input_formHelperText__EwCsr"></p>
             </div>
@@ -4983,9 +4993,10 @@
               <p class="Input_formHelperText__EwCsr"></p>
             </div>
             <p class="exceptions"></p>
+            <p class="success" style="color: green"></p>
               <button
-                class="Button_button___CisL Button_button___CisL Button_contained__8_KFk Button_contained-primary__IViyX"
-                tabindex="0" type="submit" style="color: rgb(255, 255, 255);"><span class="Button_label__jamx3">Сменить
+                class="Button_button___CisL Button_button___CisL Button_contained__8_KFk Button_contained-primary__IViyX Button_change_password"
+                tabindex="0" type="button" style="color: rgb(255, 255, 255);"><span class="Button_label__jamx3">Сменить
                   пароль</span></button>
           </form>
         </div>
@@ -4997,9 +5008,7 @@
     </div>
   </main>
 </div>
-
-<script src="{{ url_for('static', path='profile/profile_avatar_post.js') }}"></script>
-<script src="{{ url_for('static', path='title/js/fetch_requests/fetch_request.js') }}"></script>
 <script>
+  listen_change_password_button()  
 </script>
 {% endblock %}
