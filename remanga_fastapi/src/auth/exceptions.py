@@ -51,3 +51,15 @@ def invalid_csrf_token():
         status_code=status.HTTP_403_FORBIDDEN, 
         detail="Invalid CSRF token"
     )
+
+def invalid_token():
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST, 
+        detail="Invalid token"
+    )
+
+def email_not_exists():
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND, 
+        detail="There is no user with this email."
+    )

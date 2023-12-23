@@ -3,13 +3,6 @@ from datetime import datetime
 
 from title.schemas import Title
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-class TokenData(BaseModel):
-    username: str | None = None
-
 class User(BaseModel):
     id: int
     password: str

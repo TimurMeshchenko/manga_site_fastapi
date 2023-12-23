@@ -1,6 +1,5 @@
-function listen_signin_button(csrf_token) {
+function listen_signin_button() {
     const signin_button = document.querySelector(".Button_button___CisL");
-    const exceptions_element = document.querySelector(".exceptions");
     const username = document.querySelector("#id_username")
     const password = document.querySelector("#id_password")
 
@@ -18,7 +17,7 @@ function listen_signin_button(csrf_token) {
             username: username.value,
             password: password.value
         })
-   
+                
         fetch_request('/api/signin', fetch_data, csrf_token, update_data_callback)
     });
 }

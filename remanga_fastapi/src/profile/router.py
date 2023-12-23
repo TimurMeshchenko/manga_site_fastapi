@@ -6,9 +6,8 @@ from sqlalchemy.orm import Session
 from config import get_db
 from auth.schemas import User as schemas_User, UserChangePassword 
 from auth.dependencies import get_current_user
-from auth.utils import set_context_and_cookie_csrf_token, validate_csrf, verify_password, is_invalid_password, get_password_hash
+from auth.utils import set_context_and_cookie_csrf_token, validate_csrf, verify_password, get_password_hash, is_invalid_passwords
 from auth.models import User as models_User
-from auth.exceptions import different_passwords, invalid_password
 
 router = APIRouter(tags=["profile"])
 
@@ -72,8 +71,7 @@ async def change_password(
             detail='Old password is incorrect'
         )
     
-    if passwords.new_password != passwords.new_password2: different_passwords()
-    if is_invalid_password(passwords.new_password): invalid_password()
+    is_invalid_passwords(passwords.new_password, passwords.new_password2)
 
     current_user.password = get_password_hash(passwords.new_password)
 

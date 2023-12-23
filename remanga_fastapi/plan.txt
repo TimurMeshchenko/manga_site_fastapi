@@ -1,34 +1,53 @@
-для поиска <script> в search.js
+reset_password.js на методы
+
+listen_reset_password_link()
 
 -------------------------------------------
 
-redis + rabbitmq отправка email с использованием smtplib
+middleware для всех post validate csrf
+
+current_user: Annotated[User, Depends(get_current_user)] без Annotated
+current_user: User = Depends(get_current_user)
+или
+current_user = Depends(get_current_user)
 
 -------------------------------------------
 
-все методы в async + js
-везде подсказки, что возвращает (в router response_model)
+все методы в async у всех методов await, проверять + js
+везде подсказки, что возвращает -> Type
+описание у каждого метода
+"""
+Get item by ID.
+"""
+
 тесты, gitflow
 
 -------------------------------------------
 
-Создать .env
 
-docker fastapi(gunicorn, .env) + nginx upstream, postgresql redis, rabbitmq
+Создать .env,как у с ютуба, закинуть email и т.д
+
+docker fastapi(gunicorn, .env) + nginx upstream, postgresql, rabbitmq
 В nginx /static /media
 proxy на :8000
 
 -------------------------------------------
 
 Добавить функционал из fastapi в django.
-Исправить код, как в fastapi. 
+
+Подправить код, как в fastapi. 
 Таблицы переделать.
 
 Django Channels WebSokets
-отправка email с redis celery
+отправка email.
+с redis celery. docker run redis celery. 
+use_celery = True. Две версии
+
+"*Логин/почта" в title template на Логин
 
 дописать к django docker redis celery nginx
 В nginx /static /media, proxy на :8000
+Проверить на gunicorn запустить
 
 -------------------------------------------
 
@@ -58,9 +77,10 @@ QA Automation Selenium, Bash, Web-UI, API
 
 -------------------------------------------
 
+docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.12-management
+
 Пароль у акков fsafsafzcx
-cd .\remanga_fastapi\src
-python -m uvicorn main:app --reload
+cd .\remanga_fastapi\src\; python -m uvicorn main:app --reload
 
 python -m alembic revision --autogenerate -m "init"
 python -m alembic upgrade head

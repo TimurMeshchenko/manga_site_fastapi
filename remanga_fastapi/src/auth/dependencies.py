@@ -13,7 +13,7 @@ async def get_current_user(request: Request, db: Session = Depends(get_db)):
 
     if not token_data: return
 
-    user = utils.get_user(db, username=token_data.username)
+    user = utils.get_user(db, token_data)
     
     if user is None: return
         
