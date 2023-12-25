@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Request, Depends
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
-from typing import Annotated
 
 from auth.schemas import User
 from auth.dependencies import get_current_user
@@ -14,7 +13,7 @@ templates = Jinja2Templates(directory="../templates")
 @router.get("/bookmarks", name="remanga:bookmarks")
 async def bookmarks(
     request: Request, 
-    current_user: Annotated[User, Depends(get_current_user)],
+    current_user: User = Depends(get_current_user),
     ):
     signin_url = auth_router.url_path_for("remanga:signin")
 

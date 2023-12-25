@@ -1,4 +1,4 @@
-function listen_signup_button(csrf_token) {
+function listen_signup_button() {
     const signup_button = document.querySelector(".Button_button___CisL");
     const exceptions_element = document.querySelector(".exceptions");
     const username = document.querySelector("#id_username")
@@ -14,7 +14,7 @@ function listen_signup_button(csrf_token) {
         else {
             signin_fetch_data = get_signin_fetch_data(username, password);
             reload_page = () => location.reload(); 
-            fetch_request('/api/signin', signin_fetch_data, csrf_token, reload_page);
+            fetch_request('/api/signin', signin_fetch_data, reload_page);
         }
     }
 
@@ -26,7 +26,7 @@ function listen_signup_button(csrf_token) {
             password2: password2.value
         })
    
-        fetch_request('/api/signup', fetch_data, csrf_token, update_data_callback)
+        fetch_request('/api/signup', fetch_data, update_data_callback)
     });
 }
 

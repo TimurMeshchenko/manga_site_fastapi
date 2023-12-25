@@ -18,6 +18,6 @@ function listen_signin_button() {
             password: password.value
         })
                 
-        fetch_request('/api/signin', fetch_data, csrf_token, update_data_callback)
+        fetch_request('/api/signin', fetch_data, update_data_callback)
     });
 }

@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, Request, Response, UploadFile, HTTPException, status
 from fastapi.templating import Jinja2Templates
-from typing import Annotated
 from sqlalchemy.orm import Session
+from typing import Dict
 
-from config import get_db
+from database import get_db
 from auth.schemas import User as schemas_User, UserChangePassword 
 from auth.dependencies import get_current_user
-from auth.utils import set_context_and_cookie_csrf_token, validate_csrf, verify_password, get_password_hash, is_invalid_passwords
+from auth.utils import set_context_and_cookie_csrf_token, verify_password, get_password_hash, is_invalid_passwords
 from auth.models import User as models_User
 
 router = APIRouter(tags=["profile"])
@@ -15,7 +15,7 @@ templates = Jinja2Templates(directory="../templates")
 
 @router.get("/user/{user_id}", name="remanga:profile")
 async def profile(user_id: int, request: Request, 
-                  current_user: Annotated[schemas_User, Depends(get_current_user)], 
+                  current_user: schemas_User = Depends(get_current_user), 
                   db: Session = Depends(get_db)):
     context = {"request": request}
     context["profile"] = db.query(models_User).filter(models_User.id == user_id).first()
@@ -32,15 +32,12 @@ def delete_cookie(response: Response):
     response.status_code = 302
     return response
 
-@router.post("/api/change_avatar")
+@router.put("/api/change_avatar")
 async def change_avatar(
-    request: Request, 
     avatar: UploadFile,
-    current_user: Annotated[schemas_User, Depends(get_current_user)],
+    current_user: schemas_User = Depends(get_current_user),
     db: Session = Depends(get_db)
-):
-    validate_csrf(request)
-    
+) -> Dict[str, str]:    
     if avatar.content_type not in ["image/jpeg", "image/png", "image/gif"]:
         raise HTTPException(status_code=400, detail="Invalid file type")
 
@@ -56,15 +53,12 @@ async def change_avatar(
 
     return {"message": "Successfuly uploaded"}
 
-@router.post("/api/change_password")
+@router.put("/api/change_password")
 async def change_password(
-    request: Request, 
     passwords: UserChangePassword,
-    current_user: Annotated[schemas_User, Depends(get_current_user)],
+    current_user: schemas_User = Depends(get_current_user),
     db: Session = Depends(get_db)
-):
-    validate_csrf(request)
-
+) -> Dict[str, str]:
     if (not verify_password(passwords.old_password, current_user.password)):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

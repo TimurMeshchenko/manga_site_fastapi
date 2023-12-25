@@ -1,6 +1,6 @@
-function fetch_request(url, fetch_data, csrf_token, update_data_callback) {
+function fetch_request(url, fetch_data, update_data_callback, method = 'POST') {
     fetch(url, {
-    method: 'POST',
+    method: method,
     headers: {
         'Content-Type': 'application/json',
         'X-CSRF-Token': csrf_token

@@ -1,16 +1,17 @@
+from fastapi import Request
+from typing import Any, List 
+
 from title.models import *
 
 class Titles_filters:
-    def __init__(self, db) -> None:
-        self.db = db
+    def __init__(self, title_tables: dict):
+        self.title_tables = title_tables
+        self.manga_types = [manga_type[0] for manga_type in title_tables['manga_types']]
 
-        manga_types_query = db.query(Title.manga_type).distinct().all()
-        self.manga_types = [manga_type[0] for manga_type in manga_types_query]
-
-        self.init_filters_variables(db)
+        self.init_filters_variables()
         self.filters = None
 
-    def init_filters_variables(self, db):
+    def init_filters_variables(self) -> None:
         self.query_keys_adapted_for_table = {
             "_gte": "",
             "_lte": "",
@@ -26,12 +27,10 @@ class Titles_filters:
             'count_chapters': Title.count_chapters,
         }
 
-        self.database_tables = {
-            'genres': db.query(Genres).all(),
-            'categories': db.query(Categories).all(),
-        }
-
-    def create_filters(self, request):
+    def create_filters(self, request: Request) -> (Any | None):   
+        """
+        Iterate each query param and for different query params combine with a condition "and"
+        """             
         for query_key in list(request.query_params.keys()): 
             query_values = request.query_params.getlist(query_key)
             
@@ -46,7 +45,10 @@ class Titles_filters:
 
         return self.filters
 
-    def create_query_key_filters(self, query_key, query_values):
+    def create_query_key_filters(self, query_key: str, query_values: List[str]) -> None:
+        """
+        Create filters for all value query param
+        """         
         query_key_adapted = self.get_query_key_adapted(query_key)
         self.query_key_filters = None 
         
@@ -59,14 +61,20 @@ class Titles_filters:
 
             self.add_filter(query_key, query_key_adapted, query_value)
     
-    def get_query_key_adapted(self, query_key):
+    def get_query_key_adapted(self, query_key: str) -> str:
+        """
+        Remove conditions in the query param name
+        """   
         for query_key_for_adapte in self.query_keys_adapted_for_table:
             if query_key_for_adapte in query_key:
                 return query_key.replace(query_key_for_adapte, "")
         
         return query_key
 
-    def add_range_filters(self, query_key, query_key_adapted, query_value):        
+    def add_range_filters(self, query_key: str, query_key_adapted: str, query_value: float | int) -> bool:        
+        """
+        Filters ranging from to
+        """           
         query_filter = None
 
         if "lte" in query_key:
@@ -80,7 +88,10 @@ class Titles_filters:
         
         return True
 
-    def add_filter_to_query_key_filters(self, query_filter, query_key):
+    def add_filter_to_query_key_filters(self, query_filter: Any, query_key: str) -> None:
+        """
+        For conditions with the same query param name combine with a condition "or"
+        """          
         if self.query_key_filters is None:
             self.query_key_filters = query_filter
         else:
@@ -89,13 +100,16 @@ class Titles_filters:
             else:
                 self.query_key_filters |= query_filter 
 
-    def add_filter(self, query_key, query_key_adapted, query_value):        
+    def add_filter(self, query_key: str, query_key_adapted: str, query_value: float | int) -> None:                
+        """
+        Other filters except ranging from to
+        """         
         title_table_column = self.title_table_columns[query_key_adapted]
 
         if query_key_adapted == "types": 
             query_filter = title_table_column == self.manga_types[query_value]      
         else:
-            query_value_id = self.database_tables[query_key_adapted][query_value].id
+            query_value_id = self.title_tables[query_key_adapted][query_value].id
             query_filter = title_table_column.any(id = query_value_id)
 
         if "exclude" in query_key:

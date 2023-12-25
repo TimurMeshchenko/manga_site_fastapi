@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 
 class Categories(BaseModel):
@@ -16,15 +16,15 @@ class Title_chapters(BaseModel):
     tome: int
 
 class Comment(BaseModel):
+    model_config: ConfigDict = ConfigDict(from_attributes=True)
+    
     id: int
     author_id: int
     content: str
     created_at: datetime
     likes: int = 0
-
-    class Config:
-        from_attributes = True
        
+
 class Title_base(BaseModel):
     id: int
     rus_name: str
@@ -34,6 +34,8 @@ class Title_base(BaseModel):
     avg_rating: float = 0.0
 
 class Title(Title_base):
+    model_config: ConfigDict = ConfigDict(from_attributes=True)
+
     issue_year: int
     count_chapters: int
     count_rating: int = 0
@@ -45,9 +47,6 @@ class Title(Title_base):
     chapters: list[Title_chapters]
     comments: list[Comment] = []
     
-    class Config:
-        from_attributes = True
-
 class Title_rating(BaseModel):
     id: int
     user_id: int

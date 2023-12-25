@@ -1,4 +1,5 @@
 from fastapi import HTTPException, status
+from fastapi.responses import JSONResponse
 
 def invalid_user_data():
     raise HTTPException(
@@ -47,9 +48,9 @@ def empty_username():
     )   
 
 def invalid_csrf_token():
-    raise HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN, 
-        detail="Invalid CSRF token"
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN,
+        content={"detail": "CSRF token missing"}
     )
 
 def invalid_token():

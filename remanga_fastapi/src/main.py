@@ -1,8 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from asyncio import get_event_loop
+from typing import Generator, Any
+import os
 
 from catalog.router import router as catalog_router
 from title.router import router as title_router
@@ -12,10 +14,12 @@ from bookmarks.router import router as bookmarks_router
 from search.router import router as search_router
 
 from auth.router import connect_rabbitmq
+from auth.utils import is_valid_csrf
+from auth.exceptions import invalid_csrf_token
 from config import use_rabbitmq
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> Generator:   
     if use_rabbitmq:
         loop = get_event_loop()
         await loop.create_task(connect_rabbitmq())
@@ -23,10 +27,7 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(lifespan=lifespan)
-
-app.mount("/static", StaticFiles(directory="static"), name="static")
-app.mount("/media", StaticFiles(directory="media"), name="media")
-
+    
 app.include_router(catalog_router)
 app.include_router(title_router)
 app.include_router(auth_router)
@@ -47,3 +48,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+is_pytest_run = not os.path.exists("static")
+path_to_src = "../src/" if is_pytest_run else ""
+
+app.mount("/static", StaticFiles(directory=f"{path_to_src}static"), name="static")
+app.mount("/media", StaticFiles(directory=f"{path_to_src}media"), name="media")
+
+@app.middleware("http")
+async def add_validate_csrf(request: Request, call_next: Any) -> Response:
+    if request.method in ["POST", "PUT"]:
+        if not is_valid_csrf(request):
+            return invalid_csrf_token()
+    
+    response = await call_next(request)
+
+    return response

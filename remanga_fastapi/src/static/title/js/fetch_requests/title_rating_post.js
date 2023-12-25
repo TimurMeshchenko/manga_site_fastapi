@@ -32,7 +32,7 @@ class Title_rating_post {
 
         document.querySelector('.form_title_rating').addEventListener('submit', (event) => {
             event.preventDefault();
-            fetch_request("/api/title_rating", fetch_data, csrf_token, this.update_data_callback)
+            fetch_request("/api/title_rating", fetch_data, this.update_data_callback)
         });
     }
 

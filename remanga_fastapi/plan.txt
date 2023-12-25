@@ -1,35 +1,28 @@
-reset_password.js на методы
-
-listen_reset_password_link()
-
--------------------------------------------
-
-middleware для всех post validate csrf
-
-current_user: Annotated[User, Depends(get_current_user)] без Annotated
-current_user: User = Depends(get_current_user)
-или
-current_user = Depends(get_current_user)
-
--------------------------------------------
-
-все методы в async у всех методов await, проверять + js
-везде подсказки, что возвращает -> Type
-описание у каждого метода
-"""
-Get item by ID.
-"""
-
 тесты, gitflow
 
+Максимальное количество тестов на каждую функцию
+Сначала успешный тест, потом все возможные исключения(обработка исключений), больше лучше
+Тесты не зависимые от других и функций
+
+каждый роутер ответы, что создает, если есть query params еще их, csrf, бд, WebSokets
+
 -------------------------------------------
 
+все проверить + rabbitmq redis
 
-Создать .env,как у с ютуба, закинуть email и т.д
+-------------------------------------------
 
-docker fastapi(gunicorn, .env) + nginx upstream, postgresql, rabbitmq
+проверить requirements 
+в env pip install -r requirements  
+
+Создать .env и config, как с ютуба, закинуть с auth.utils secret_key smtp database rabbitmq redis
+Посмотри у fastapi  Settings and Environment Variables¶
+
+docker fastapi(gunicorn, .env) + nginx upstream, postgresql, rabbitmq redis
 В nginx /static /media
 proxy на :8000
+
+Проверить rabbitmq redis
 
 -------------------------------------------
 
@@ -45,6 +38,24 @@ use_celery = True. Две версии
 
 "*Логин/почта" в title template на Логин
 
+-------------------------------------------
+
+Дописать тесты
+
+убрать подсказки у переменных
+подсказки для аргументов (навестись на функцию, если any, то на переменные), 
+что возвращает -> None (всегда указывать)
+
+Для title_filters взять у fastapi
+
+описание для методов для которых можно написать больше чем их название
+
+-------------------------------------------
+
+docker убедиться чтобы запускался всегда с первого раза, иначе
+django запускается раньше бд, нужно взять скрипт с гайдов, чтобы ждал
+Создать .env
+
 дописать к django docker redis celery nginx
 В nginx /static /media, proxy на :8000
 Проверить на gunicorn запустить
@@ -55,7 +66,12 @@ use_celery = True. Две версии
 
 -------------------------------------------
 
-asyncio парсер
+asyncio парсер, каждый тайтл асинхронно добавлять
+
+run запускает синхронно функцию
+create_task начинает выполнения асинхронно функцию на фоне
+gather комбинирует несколько асинхронных функций
+await ожидает выполнения
 
 -------------------------------------------
 
@@ -79,8 +95,9 @@ QA Automation Selenium, Bash, Web-UI, API
 
 docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.12-management
 
+docker run -d --rm --name redis -p 6379:6379 redis:alpine
+docker exec -it redis sh
+redis-cli
+
 Пароль у акков fsafsafzcx
 cd .\remanga_fastapi\src\; python -m uvicorn main:app --reload
-
-python -m alembic revision --autogenerate -m "init"
-python -m alembic upgrade head

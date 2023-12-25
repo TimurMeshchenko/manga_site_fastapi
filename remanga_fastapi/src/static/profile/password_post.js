@@ -32,6 +32,6 @@ function listen_change_password_button() {
             new_password2: new_password2.value
         })
    
-        fetch_request('/api/change_password', fetch_data, csrf_token, update_data_callback)
+        fetch_request('/api/change_password', fetch_data, update_data_callback, 'PUT')
     });
 }

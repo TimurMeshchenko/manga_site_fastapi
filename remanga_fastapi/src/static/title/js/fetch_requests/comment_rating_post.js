@@ -31,7 +31,7 @@ class Comment_rating_post {
                 action: this.comment_rating_element.value,
             })
 
-            fetch_request("/api/comment_rating", fetch_data, csrf_token, this.update_data_callback)
+            fetch_request("/api/comment_rating", fetch_data, this.update_data_callback)
         });
     }
 

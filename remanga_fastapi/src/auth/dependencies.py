@@ -2,9 +2,10 @@ from fastapi import Depends, Request
 from sqlalchemy.orm import Session
 
 from . import utils
-from config import get_db
+from database import get_db
+from .schemas import User
 
-async def get_current_user(request: Request, db: Session = Depends(get_db)):        
+async def get_current_user(request: Request, db: Session = Depends(get_db)) -> (User | None):        
     token = request.cookies.get("jwt_token")
     
     if not token: return 

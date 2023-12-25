@@ -1,9 +1,11 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 
 from title.schemas import Title
 
 class User(BaseModel):
+    model_config: ConfigDict = ConfigDict(from_attributes=True)
+
     id: int
     password: str
     last_login: datetime
@@ -18,9 +20,6 @@ class User(BaseModel):
     avatar: str
 
     bookmarks: list[Title] = []
-
-    class Config:
-        from_attributes = True
 
 class UserSignup(BaseModel):
     username: str
