@@ -2,25 +2,15 @@ from fastapi import APIRouter, Depends, Request, Response
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
-import aio_pika
 from asyncio import get_event_loop
 
 from . import utils, schemas, dependencies, exceptions
 from database import get_db
-from config import use_rabbitmq
+from config import Config
 
 router = APIRouter(tags=["auth"])
 
 templates = Jinja2Templates(directory="../templates")
-
-channel = queue = None
-
-async def connect_rabbitmq() -> None:
-    global channel, queue
-
-    connection = await aio_pika.connect_robust(host='localhost')
-    channel = await connection.channel()
-    queue = await channel.declare_queue('email_queue')
 
 @router.get("/signin", name="remanga:signin")
 async def signin(request: Request, current_user: schemas.User = Depends(dependencies.get_current_user)):
@@ -68,9 +58,9 @@ async def reset_password_email(email_dict: dict, db: Session = Depends(get_db)) 
     password_reset_token = utils.create_access_token(token_data)
 
     loop = get_event_loop()
-
-    if (use_rabbitmq):
-        loop.create_task(utils.send_reset_password_email_rabbitmq(email, password_reset_token, channel, queue))
+            
+    if (Config.use_rabbitmq):
+        loop.create_task(utils.send_reset_password_email_rabbitmq(email, password_reset_token))
     else:
         loop.create_task(utils.send_reset_password_email(email, password_reset_token))
 

@@ -13,17 +13,19 @@ from profile.router import router as profile_router
 from bookmarks.router import router as bookmarks_router
 from search.router import router as search_router
 
-from auth.router import connect_rabbitmq
 from auth.utils import is_valid_csrf
 from auth.exceptions import invalid_csrf_token
-from config import use_rabbitmq
+from config import Config
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> Generator:   
-    if use_rabbitmq:
-        loop = get_event_loop()
-        await loop.create_task(connect_rabbitmq())
-        
+    config = Config()
+    loop = get_event_loop()
+
+    await loop.create_task(config.connect_rabbitmq())
+    
+    config.check_redis_connection()
+
     yield
 
 app = FastAPI(lifespan=lifespan)

@@ -695,11 +695,13 @@
           </a>
         </div>
         {% else %}
+        <a href="{{ url_for('remanga:signin') }}">
         <button
           class="Button_button__JOS9_ Button_button__JOS9_ Button_contained__C0zVd Button_contained-primary__ZtvzA hidden-xsDown"
           tabindex="0" type="button" style="margin-left: 8px">
-          <a class="Button_label__py8bK" href="{{ url_for('remanga:signin') }}">Войти</a>
+          <span class="Button_label__py8bK">Войти</span>
         </button>
+        </a>
         {% endif %}
       </div>
     </nav>

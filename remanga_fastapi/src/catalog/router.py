@@ -6,7 +6,7 @@ from . import utils
 from database import get_db
 from auth.schemas import User
 from auth.dependencies import get_current_user
-from config import use_redis
+from config import Config
 
 router = APIRouter(tags=["catalog"])
 
@@ -18,7 +18,7 @@ async def catalog(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):        
-    if use_redis and not request.query_params:
+    if Config.use_redis and not request.query_params:
         title_tables = utils.get_set_title_tables_redis(db)
         titles = title_tables.pop('titles') 
     else:

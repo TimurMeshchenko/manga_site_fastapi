@@ -6,16 +6,18 @@ from fastapi import Depends, Request
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from fastapi.templating import Jinja2Templates
+from jinja2 import Environment, FileSystemLoader
 
-import re
-import secrets
-import aiosmtplib
-import json
+from re import match
+from secrets import token_hex
+from aiosmtplib import send
+from json import dumps, loads
 from email.message import EmailMessage
-import aio_pika
+from aio_pika import Message
 
 from . import models, exceptions
 from .schemas import User, UserSignup
+from config import Config
 
 SECRET_KEY = "c8f1c5004b4cdf41e7db8c675025fea43ac8348deb6b25d8f841d3baff6a6280"
 ALGORITHM = "HS256"
@@ -101,15 +103,15 @@ def is_invalid_passwords(password: str, password2: str) -> None:
 
 def is_invalid_email(email: str) -> bool:
     email_pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-    return re.match(email_pattern, email) is None
+    return match(email_pattern, email) is None
 
 def is_invalid_username(username: str) -> bool:
     username_pattern = r'^[a-zA-Z0-9_]{3,20}$'
-    return re.match(username_pattern, username) is None
+    return match(username_pattern, username) is None
 
 def is_invalid_password(password: str) -> bool:
     password_pattern = r'^[a-zA-Z0-9_@$!%*?&-]{6,}$'
-    return re.match(password_pattern, password) is None
+    return match(password_pattern, password) is None
 
 def is_not_email_exists(db: Session, email: str) -> bool:
     return db.query(models.User).filter(models.User.email == email).first() is None
@@ -125,7 +127,7 @@ def set_context_and_cookie_csrf_token(templates: Jinja2Templates, context: dict,
     return response
 
 def generate_csrf_token() -> str:
-    return secrets.token_hex(32)
+    return token_hex(32)
 
 def is_valid_csrf(request: Request) -> bool:
     csrf_token_cookies = request.cookies.get("csrf_token")
@@ -136,30 +138,34 @@ def is_valid_csrf(request: Request) -> bool:
     
     return True
 
-async def send_reset_password_email_rabbitmq(email: str, password_reset_token: str, channel, queue) -> None:
-    email_data_json = json.dumps({"email": email, "token": password_reset_token})
+async def send_reset_password_email_rabbitmq(email: str, password_reset_token: str) -> None:
+    email_data_json = dumps({"email": email, "token": password_reset_token})
 
-    await channel.default_exchange.publish(aio_pika.Message(body=email_data_json.encode()), routing_key='email_queue')
-    await rabbitmq_consume_email_data(queue) 
+    await Config.channel.default_exchange.publish(Message(body=email_data_json.encode()), routing_key='email_queue')
+    await rabbitmq_consume_email_data(Config.queue)
 
 async def rabbitmq_consume_email_data(queue) -> None:
     async for message in queue:
         async with message.process():
-            email_data = json.loads(message.body)
+            email_data = loads(message.body)
             await send_reset_password_email(email_data["email"], email_data["token"])
         break
 
 async def send_reset_password_email(to_email: str, password_reset_token: str) -> None:
-    from_email = 'fwafwafwawfawf21@outlook.com'
+    from_email = 'fawwa2515af@outlook.com'
     SMTP_PASSWORD = "fGJsS(Q.PP#95r#"
     server_host = "http://localhost:8000"
 
     password_reset_url = f"{server_host}/reset_password?token={password_reset_token}"
 
+    env = Environment(loader=FileSystemLoader("../templates"))
+    template = env.get_template('reset_password_letter.html')
+    html_content = template.render(password_reset_url=password_reset_url)
+
     message = EmailMessage()
     message["From"] = from_email
     message["To"] = to_email
     message["Subject"] = "Manga password recovery"
-    message.set_content(f"<a href='{password_reset_url}'>Click here to reset your password</a>", subtype='html')
+    message.set_content(html_content, subtype='html')
 
-    await aiosmtplib.send(message, hostname="smtp-mail.outlook.com", username=from_email, password=SMTP_PASSWORD, port=587, start_tls=True)
+    await send(message, hostname="smtp-mail.outlook.com", username=from_email, password=SMTP_PASSWORD, port=587, start_tls=True)

@@ -86,7 +86,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str, db: Session 
 
             websocket_type = data["type"]
 
-            await handlers_websockets[websocket_type](db, connections, data)
-        
+            if websocket_type in handlers_websockets:
+                await handlers_websockets[websocket_type](db, connections, data)
     except WebSocketDisconnect:
         del connections[session_id]

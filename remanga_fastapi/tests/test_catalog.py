@@ -3,10 +3,15 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 
 from src.catalog.utils import *
-from src.config import use_redis
+from src.config import Config
 
 full_title_tables = dict()
-   
+config = Config()
+
+config.check_redis_connection()
+
+use_redis = config.use_redis
+
 def test_create_test_database_data(db: Session) -> None:
     tables_names = {
         'remanga_genres': 'name',
@@ -27,9 +32,20 @@ async def test_catalog(ac: AsyncClient) -> None:
 
     assert response.status_code == 200
 
+async def test_query_params_exceptions(ac: AsyncClient) -> None:
+    query_params_exceptions = [
+        'types=', 'random_query_key=0', 'types=random_query_value',
+        'types=0.0', 'issue_year_gte=0.0.0', 'types_gte=0',
+        'issue_year_exclude=0', 'types=999999999'
+    ]
+    
+    for query_param in query_params_exceptions:
+        response = await ac.get(f"/?{query_param}")
+
+        assert response.status_code == 200
+
 def test_set_title_tables_redis(db: Session) -> None:
     if not use_redis: return
-
     title_tables = get_title_tables(db)
     title_tables['titles'] = get_titles(db).all()
 
@@ -43,7 +59,6 @@ def test_set_title_tables_redis(db: Session) -> None:
 
 def test_get_list_title_tables_redis() -> None:
     if not use_redis: return
-
     manga_type_value = 'a'
     redis.rpush('manga_types', manga_type_value)
 
@@ -55,7 +70,6 @@ def test_get_list_title_tables_redis() -> None:
 
 def test_get_hashes_title_tables_redis() -> None:
     if not use_redis: return
-
     genres_value = {'id': 1, 'name': 'a'}
     redis.hset('genres:1', mapping=genres_value)
     redis.rpush('genres', 'genres:1')
@@ -127,9 +141,9 @@ def get_range_filter(titles_filters: Titles_filters, query_key: str,
     query_key_adapted = titles_filters.get_query_key_adapted(query_key)
         
     if "gte" in query_key: 
-        query_filter = titles_filters.title_table_columns[query_key_adapted] >= query_value
+        query_filter = titles_filters.title_table_columns_ranges[query_key_adapted] >= query_value
     else:
-        query_filter = titles_filters.title_table_columns[query_key_adapted] <= query_value
+        query_filter = titles_filters.title_table_columns_ranges[query_key_adapted] <= query_value
 
     return str(query_filter)
 
@@ -191,8 +205,4 @@ def get_manga_type_exclude_query_filters(titles_filters: Titles_filters, query_k
         query_filter = combine_query_filters(query_filter, sql_condition_reversed, query_key)
 
     return str(query_filter) 
-
-
-
-
 
