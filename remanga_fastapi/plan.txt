@@ -1,10 +1,16 @@
+Для create_filters if (''.join(query_values) == str() or query_key == 'page'): continue
+Обработать любой символ, цифра выходящая за индекс, query key которого нет
+
+В config включать redis rabbitmq, если есть подключение 
+use_redis = True if redis_connected else False
+
 тесты, gitflow
 
-Максимальное количество тестов на каждую функцию
-Сначала успешный тест, потом все возможные исключения(обработка исключений), больше лучше
-Тесты не зависимые от других и функций
+Сначала успешный тест, потом все возможные исключения(обработка исключений), 
+больше лучше. Для каждой важной функции
+Тесты не зависимые от других и функций, 1 assert, prepare, act, assert
 
-каждый роутер ответы, что создает, если есть query params еще их, csrf, бд, WebSokets
+python -m pytest -v -s
 
 -------------------------------------------
 
@@ -15,8 +21,8 @@
 проверить requirements 
 в env pip install -r requirements  
 
-Создать .env и config, как с ютуба, закинуть с auth.utils secret_key smtp database rabbitmq redis
-Посмотри у fastapi  Settings and Environment Variables¶
+Создать .env и config, как с ютуба, закинуть с auth.utils secret_key smtp (_test)database rabbitmq redis
+Посмотри у fastapi  Settings and Environment Variables 
 
 docker fastapi(gunicorn, .env) + nginx upstream, postgresql, rabbitmq redis
 В nginx /static /media

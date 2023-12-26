@@ -1,11 +1,9 @@
 from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
-from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
 from . import utils
 from database import get_db
-from title.models import Title
 from auth.schemas import User
 from auth.dependencies import get_current_user
 from config import use_redis
@@ -25,7 +23,7 @@ async def catalog(
         titles = title_tables.pop('titles') 
     else:
         title_tables = utils.get_title_tables(db)
-        titles = db.query(Title).order_by(desc(Title.count_rating))
+        titles = utils.get_titles(db)
 
     page = request.query_params.get("page")
     titles = utils.get_filtered_titles(title_tables, titles, request)

@@ -47,7 +47,7 @@ class Titles_filters:
 
     def create_query_key_filters(self, query_key: str, query_values: List[str]) -> None:
         """
-        Create filters for all value query param
+        Create filters for all values in query param
         """         
         query_key_adapted = self.get_query_key_adapted(query_key)
         self.query_key_filters = None 

@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, Query
 from fastapi.encoders import jsonable_encoder
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
@@ -13,6 +13,9 @@ from .titles_filters import Titles_filters
 redis = Redis(host='localhost', port=6379)
 
 page_size = 30
+
+def get_titles(db: Session) -> Query[Title]:
+    return db.query(Title).order_by(desc(Title.count_rating))
 
 def get_title_tables(db: Session) -> Dict[str, Any]:
     """
@@ -87,7 +90,7 @@ def get_set_title_tables_redis(db: Session) -> (dict | Dict[str, Any]):
         title_tables = get_title_tables_redis()
     else:
         title_tables = get_title_tables(db)
-        title_tables['titles'] = db.query(Title).order_by(desc(Title.count_rating)).all()
+        title_tables['titles'] = get_titles(db).all()
 
         set_title_tables_redis(title_tables)
     
