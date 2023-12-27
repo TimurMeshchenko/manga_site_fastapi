@@ -45,7 +45,8 @@ jobs:
       
       - name: Create main database tables
         run: |
-          cd migrations
+          pwd
+          cd remanga_fastapi/migrations
           sed -i 's/DATABASE_URL_TEST/DATABASE_URL/g' env.py
           cd ..
           alembic upgrade head
