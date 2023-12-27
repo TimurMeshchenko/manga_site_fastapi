@@ -3,7 +3,7 @@ from fastapi import WebSocket
 from sqlalchemy import Column
 from sqlalchemy.orm import Session
 from fastapi.templating import Jinja2Templates
-from typing import Any, Dict
+from typing import Any, Dict, Optional, Union
 
 from .models import Title, Title_rating, Comment, Comment_rating
 from auth.utils import generate_csrf_token
@@ -37,7 +37,7 @@ def register_filters(templates: Jinja2Templates) -> None:
     """
     templates.env.filters['timesince'] = timesince
 
-def get_title_rating(db: Session, user_id: int, title_id: int) -> (Title_rating | None):
+def get_title_rating(db: Session, user_id: int, title_id: int) -> Optional[Title_rating]:
     return db.query(Title_rating).filter(Title_rating.user_id == user_id, Title_rating.title_id == title_id).first()
 
 def get_user_title_comments_ratings_dict(db: Session, user_id: int, title_id: int) -> dict:
@@ -56,7 +56,7 @@ def get_user_title_comments_ratings_dict(db: Session, user_id: int, title_id: in
 
     return comments_ratings
 
-def get_title_by_id(db: Session, title_id: int) -> (Title | None):
+def get_title_by_id(db: Session, title_id: int) -> Optional[Title]:
     return db.query(Title).filter(Title.id == title_id).first()
 
 async def set_and_send_websockets_csrf_token(websocket: WebSocket) -> None:
@@ -209,7 +209,7 @@ def rating_comment(user: User, db: Session, fetch_data: dict) -> Dict[str, Any]:
 
     return response
 
-def is_same_comment_rating_exists(comment_rating_object: Comment_rating, action: str) -> (bool | Column[bool]):
+def is_same_comment_rating_exists(comment_rating_object: Comment_rating, action: str) -> Union[bool, Column[bool]]:
     if comment_rating_object:
         return not comment_rating_object.is_liked if 'dislike' in action else comment_rating_object.is_liked
     

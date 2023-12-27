@@ -7,6 +7,7 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from fastapi.templating import Jinja2Templates
 from jinja2 import Environment, FileSystemLoader
+from typing import Optional
 
 from re import match
 from secrets import token_hex
@@ -33,12 +34,12 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
-def get_user(db: Session, username: str) -> (User | None):
+def get_user(db: Session, username: str) -> Optional[User]:
     if not username: exceptions.empty_username()
     
     return db.query(models.User).filter(models.User.username == username).first()
 
-def get_user_by_email_token(db: Session, token: str) -> (User | None):
+def get_user_by_email_token(db: Session, token: str) -> Optional[User]:
     email = get_token_data(token)
 
     if not email: exceptions.invalid_token()
@@ -49,7 +50,7 @@ def get_user_by_email_token(db: Session, token: str) -> (User | None):
 
     return user
 
-def authenticate_user(db: Session, username: str, password: str) -> (User | None):
+def authenticate_user(db: Session, username: str, password: str) -> Optional[User]:
     user = get_user(db, username)
     
     if user and verify_password(password, user.password):

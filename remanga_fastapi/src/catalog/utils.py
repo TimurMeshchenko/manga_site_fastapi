@@ -3,7 +3,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import desc
-from typing import Dict, Any
+from typing import Dict, Any, Union
 
 from title.models import *
 from auth.schemas import User
@@ -13,7 +13,7 @@ from config import Config
 page_size = 30
 redis = Config.redis
 
-def get_set_title_tables_redis(db: Session) -> (dict | Dict[str, Any]):    
+def get_set_title_tables_redis(db: Session) -> Union[dict, Dict[str, Any]]:    
     if redis.exists('titles'):
         title_tables = get_title_tables_redis()
     else:

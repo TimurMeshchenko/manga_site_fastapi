@@ -1,5 +1,5 @@
 from fastapi import Request
-from typing import Any, List 
+from typing import Any, List, Union, Optional
 
 from title.models import *
 
@@ -30,7 +30,7 @@ class Titles_filters:
             'count_chapters': Title.count_chapters,
         }
 
-    def create_filters(self, request: Request) -> (Any | None):   
+    def create_filters(self, request: Request) -> Optional[Any]:   
         """
         Iterate each query param and for different query params combine with a condition "and"
         """             
@@ -102,7 +102,7 @@ class Titles_filters:
         
         return query_key
 
-    def add_range_filters(self, query_key: str, query_key_adapted: str, query_value: float | int) -> None:        
+    def add_range_filters(self, query_key: str, query_key_adapted: str, query_value: Union[float, int]) -> None:        
         """
         Filters ranging from to
         """           
@@ -129,7 +129,7 @@ class Titles_filters:
             else:
                 self.query_key_filters |= query_filter 
 
-    def add_filter(self, query_key: str, query_key_adapted: str, query_value: float | int) -> None:                
+    def add_filter(self, query_key: str, query_key_adapted: str, query_value: Union[float, int]) -> None:                
         """
         Other filters except ranging from to
         """         
