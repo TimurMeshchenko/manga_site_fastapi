@@ -1,7 +1,7 @@
 # from httpx import AsyncClient
 
-def a():
-    pass
+def test_a():
+    return
 
 # async def test_set_csrf_token_in_cookie(ac: AsyncClient) -> None:
 #     response = await ac.get("/signin")
