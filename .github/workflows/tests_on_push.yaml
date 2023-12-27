@@ -8,15 +8,15 @@ jobs:
     runs-on: ubuntu-latest
     
     services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: Qewads
-          POSTGRES_DB: remanga_fastapi
-        ports:
-          - '5432:5432'
-        options: '--health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5'
+      # postgres:
+      #   image: postgres:15
+      #   env:
+      #     POSTGRES_USER: postgres
+      #     POSTGRES_PASSWORD: Qewads
+      #     POSTGRES_DB: remanga_fastapi
+      #   ports:
+      #     - '5432:5432'
+      #   options: '--health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5'
 
       test_postgres:
         image: postgres:15
