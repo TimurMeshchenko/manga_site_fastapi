@@ -25,7 +25,7 @@ async def lifespan(app: FastAPI) -> Generator:
     await loop.create_task(config.connect_rabbitmq())
     
     config.check_redis_connection()
-
+    
     yield
 
 app = FastAPI(lifespan=lifespan)

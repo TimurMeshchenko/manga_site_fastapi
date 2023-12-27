@@ -5,10 +5,8 @@ from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker, Session
 from typing import Generator, Any
 
-from src.database import get_db, engine
+from src.database import get_db, engine, DATABASE_URL_TEST
 from src.main import app
-
-DATABASE_URL_TEST = "postgresql://postgres:Qewads@localhost:5432/test_remanga_fastapi"
 
 engine_test = create_engine(DATABASE_URL_TEST)
 

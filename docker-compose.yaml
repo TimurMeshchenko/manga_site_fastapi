@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  db:
+    container_name: postgresdb
+    image: postgres:alpine
+    restart: always
+    ports:
+      - 5433:5432
+    env_file:
+      - .env_docker
+    volumes:
+      - ./database_backups:/database_backups
+
+  redis:
+    container_name: redis
+    image: redis:alpine
+    restart: always
+    ports:
+      - '6379:6379'
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  web:
+    container_name: remanga
+    build: .
+    ports:
+      - '8000:8000'
+    env_file:
+      - .env_docker
+    depends_on:
+      - db
+      - redis
+      - rabbitmq

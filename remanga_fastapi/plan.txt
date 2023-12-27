@@ -1,21 +1,17 @@
-gitflow без redis
+gitflow не нужен redis, работает на docker. 
 
-все проверить
+python -m alembic revision --autogenerate -m "release"
+alembic upgrade head
 
--------------------------------------------
-
-Создать .env и config, как с ютуба, закинуть с auth.utils secret_key smtp (_test)database rabbitmq redis
-Посмотри у fastapi  Settings and Environment Variables 
-
-docker fastapi(gunicorn, .env) + nginx upstream, postgresql, rabbitmq redis
-В nginx /static /media
-proxy на :8000
-
-Проверить rabbitmq redis
+localhost для docker не существует нужен название сервиса, все как у docker
 
 -------------------------------------------
 
-Подправить код, как в fastapi.
+Залить на python anywhere или куда-нибудь еще
+
+-------------------------------------------
+
+Django Подправить код, как в fastapi.
 
 "*Логин/почта" в title template на Логин
 drop_menu_stylization скопировать
@@ -61,10 +57,9 @@ python -m pytest -v -s
 
 docker убедиться чтобы запускался всегда с первого раза, иначе
 django запускается раньше бд, нужно взять скрипт с гайдов, чтобы ждал
-Создать .env config как в fastapi
+Создать .env config как в fastapi и удалить команду по переименовании бд, брать из .env
 
-дописать к django docker redis celery nginx
-В nginx /static /media, proxy на :8000
+дописать к django docker redis celery
 Запустить на gunicorn 
 
 -------------------------------------------
@@ -90,7 +85,7 @@ django github actions добавить тест парсера
 
 -------------------------------------------
 
-docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.12-management
+docker run -d --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.12-management
 
 docker run -d --rm --name redis -p 6379:6379 redis:alpine
 docker exec -it redis sh

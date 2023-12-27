@@ -8,36 +8,88 @@ jobs:
     runs-on: ubuntu-latest
     
     services:
-      # postgres:
-      #   image: postgres:15
-      #   env:
-      #     POSTGRES_USER: postgres
-      #     POSTGRES_PASSWORD: Qewads
-      #     POSTGRES_DB: remanga_fastapi
-      #   ports:
-      #     - '5432:5432'
-      #   options: '--health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5'
+      db:
+        image: postgres:alpine
+        env_file:
+          - .env_docker
+        ports:
+          - '5432:5432'
+        options: '--health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5'
 
-      test_postgres:
-        image: postgres:15
+      db_test:
+        image: postgres:alpine
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: Qewads
-          POSTGRES_DB: test_remanga_fastapi
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: db_test
         ports:
           - '5433:5432'
         options: '--health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5'
 
+      web:
+        build: .
+        ports:
+          - '8000:8000'
+        env_file:
+          - .env_docker
+        depends_on:
+          - db
+          - db_test
+
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-          architecture: x64
+      # - uses: actions/setup-python@v2
+      #   with:
+      #     python-version: 3.9
+      #     architecture: x64
 
-      - name: Install requirements
-        run: pip install -r requirements.txt
+      # - name: Install requirements
+      #   run: pip install -r requirements.txt
 
       - name: Tests
         run: pytest
         working-directory: remanga_fastapi/tests
+
+# name: CI
+# on:
+#   push:
+#     branches:
+#       - main
+# jobs:
+#   test:
+#     runs-on: ubuntu-latest
+    
+#     services:
+#       postgres:
+#         image: postgres:15
+#         env:
+#           POSTGRES_USER: postgres
+#           POSTGRES_PASSWORD: postgres
+#           POSTGRES_DB: # вместо remanga_fastapi название сервиса postgres
+#         ports:
+#           - '5432:5432'
+#         options: '--health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5'
+
+#       test_postgres:
+#         image: postgres:15
+#         env:
+#           POSTGRES_USER: postgres
+#           POSTGRES_PASSWORD: postgres
+#           POSTGRES_DB: # test_remanga_fastapi test_postgres
+#         ports:
+#           - '5433:5432'
+#         options: '--health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5'
+
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: actions/setup-python@v2
+#         with:
+#           python-version: 3.9
+#           architecture: x64
+
+#       - name: Install requirements
+#         run: pip install -r requirements.txt
+
+#       - name: Tests
+#         run: pytest
+#         working-directory: remanga_fastapi/tests

@@ -18,7 +18,7 @@ from aio_pika import Message
 
 from . import models, exceptions
 from .schemas import User, UserSignup
-from config import Config
+from config import Config, SMTP_USER, SMTP_PASSWORD
 
 SECRET_KEY = "c8f1c5004b4cdf41e7db8c675025fea43ac8348deb6b25d8f841d3baff6a6280"
 ALGORITHM = "HS256"
@@ -153,10 +153,7 @@ async def rabbitmq_consume_email_data(queue) -> None:
         break
 
 async def send_reset_password_email(to_email: str, password_reset_token: str) -> None:
-    from_email = 'fawwa2515af@outlook.com'
-    SMTP_PASSWORD = "fGJsS(Q.PP#95r#"
     server_host = "http://localhost:8000"
-
     password_reset_url = f"{server_host}/reset_password?token={password_reset_token}"
 
     env = Environment(loader=FileSystemLoader("../templates"))
@@ -164,9 +161,9 @@ async def send_reset_password_email(to_email: str, password_reset_token: str) ->
     html_content = template.render(password_reset_url=password_reset_url)
 
     message = EmailMessage()
-    message["From"] = from_email
+    message["From"] = SMTP_USER
     message["To"] = to_email
     message["Subject"] = "Manga password recovery"
     message.set_content(html_content, subtype='html')
 
-    await send(message, hostname="smtp-mail.outlook.com", username=from_email, password=SMTP_PASSWORD, port=587, start_tls=True)
+    await send(message, hostname="smtp-mail.outlook.com", username=SMTP_USER, password=SMTP_PASSWORD, port=587, start_tls=True)
