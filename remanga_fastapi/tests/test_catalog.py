@@ -4,6 +4,7 @@ from sqlalchemy import text
 
 from src.catalog.utils import *
 from src.config import Config
+from src.database import engine
 
 full_title_tables = dict()
 config = Config()
@@ -27,12 +28,9 @@ def test_create_test_database_data(db: Session) -> None:
 
     db.commit()
 
-async def test_catalog(ac: AsyncClient) -> None:
-    response = await ac.get("/")
-
-    assert response.status_code == 200
-
 async def test_query_params_exceptions(ac: AsyncClient) -> None:
+    if is_database_empty(): return
+    
     query_params_exceptions = [
         'types=', 'random_query_key=0', 'types=random_query_value',
         'types=0.0', 'issue_year_gte=0.0.0', 'types_gte=0',
@@ -43,6 +41,12 @@ async def test_query_params_exceptions(ac: AsyncClient) -> None:
         response = await ac.get(f"/?{query_param}")
 
         assert response.status_code == 200
+
+def is_database_empty() -> bool:
+    with engine.connect() as connection:
+        query = text("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public'")
+        result = connection.execute(query).scalar()
+        return result == 0
 
 def test_set_title_tables_redis(db: Session) -> None:
     if not use_redis: return

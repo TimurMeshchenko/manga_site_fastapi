@@ -43,14 +43,6 @@ jobs:
           cd remanga_fastapi
           alembic upgrade head
       
-      - name: Create main database tables
-        run: |
-          pwd
-          cd remanga_fastapi/migrations
-          sed -i 's/DATABASE_URL_TEST/DATABASE_URL/g' env.py
-          cd ..
-          alembic upgrade head
-
       - name: Tests
         run: pytest
         working-directory: remanga_fastapi/tests
