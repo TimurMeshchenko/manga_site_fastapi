@@ -1,9 +1,5 @@
-gitflow не нужен redis, работает на docker. 
-
 python -m alembic revision --autogenerate -m "release"
 alembic upgrade head
-
-localhost для docker не существует нужен название сервиса, все как у docker
 
 -------------------------------------------
 
