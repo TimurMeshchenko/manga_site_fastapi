@@ -7,36 +7,36 @@ jobs:
   test:
     runs-on: ubuntu-latest
     
-    services:
-      db:
-        image: postgres:alpine
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: Qewads
-          POSTGRES_DB: remanga_fastapi
-        ports:
-          - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    # services:
+    #   db:
+    #     image: postgres:alpine
+    #     env:
+    #       POSTGRES_USER: postgres
+    #       POSTGRES_PASSWORD: Qewads
+    #       POSTGRES_DB: remanga_fastapi
+    #     ports:
+    #       - 5432:5432
+    #     options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
-      db_test:
-        image: postgres:alpine
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: Qewads
-          POSTGRES_DB: test_remanga_fastapi
-        ports:
-          - 5433:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    #   db_test:
+    #     image: postgres:alpine
+    #     env:
+    #       POSTGRES_USER: postgres
+    #       POSTGRES_PASSWORD: Qewads
+    #       POSTGRES_DB: test_remanga_fastapi
+    #     ports:
+    #       - 5433:5432
+    #     options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-          architecture: x64
+      # - uses: actions/checkout@v2
+      # - uses: actions/setup-python@v2
+      #   with:
+      #     python-version: 3.9
+      #     architecture: x64
 
-      - name: Install requirements
-        run: pip install -r requirements.txt
+      # - name: Install requirements
+      #   run: pip install -r requirements.txt
 
       - name: Create test database tables
         run: |
@@ -45,7 +45,9 @@ jobs:
       
       - name: Create main database tables
         run: |
-          sed -i 's/DATABASE_URL_TEST/DATABASE_URL/g' migrations/env.py
+          cd migrations
+          sed -i 's/DATABASE_URL_TEST/DATABASE_URL/g' env.py
+          cd ..
           alembic upgrade head
 
       - name: Tests
