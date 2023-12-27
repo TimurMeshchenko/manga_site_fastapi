@@ -28,15 +28,15 @@ jobs:
           - 5433:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
-      web:
-        build: .
-        ports:
-          - 8000:8000
-        env_file:
-          - .env_docker
-        depends_on:
-          - db
-          - db_test
+      # web:
+      #   build: .
+      #   ports:
+      #     - 8000:8000
+      #   env_file:
+      #     - .env_docker
+      #   depends_on:
+      #     - db
+      #     - db_test
 
     steps:
       - uses: actions/checkout@v2
@@ -47,6 +47,11 @@ jobs:
 
       # - name: Install requirements
       #   run: pip install -r requirements.txt
+
+      - name: Build and test
+        run: |
+          docker build -t web .
+          docker run -d -p 8000:8000 --env-file .env_docker --name remanga --network host web
 
       - name: Tests
         run: pytest
