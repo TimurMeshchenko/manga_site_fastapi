@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
+from typing import Optional
 
 from title.schemas import Title
 
@@ -11,9 +12,9 @@ class User(BaseModel):
     last_login: datetime
     is_superuser: bool
     username: str
-    first_name: str | None = None
-    last_name: str | None = None
-    email: str | None = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    email: Optional[str] = None
     is_staff: bool
     is_active: bool
     date_joined: datetime
