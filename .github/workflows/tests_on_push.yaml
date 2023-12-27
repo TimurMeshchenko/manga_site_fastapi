@@ -12,8 +12,8 @@ jobs:
         image: postgres:alpine
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: db
+          POSTGRES_PASSWORD: Qewads
+          POSTGRES_DB: remanga_fastapi
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
@@ -22,8 +22,8 @@ jobs:
         image: postgres:alpine
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: db_test
+          POSTGRES_PASSWORD: Qewads
+          POSTGRES_DB: test_remanga_fastapi
         ports:
           - 5433:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
@@ -40,18 +40,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      # - uses: actions/setup-python@v2
-      #   with:
-      #     python-version: 3.9
-      #     architecture: x64
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+          architecture: x64
 
-      # - name: Install requirements
-      #   run: pip install -r requirements.txt
+      - name: Install requirements
+        run: pip install -r requirements.txt
 
-      - name: Build and test
-        run: |
-          docker build -t web .
-          docker run -d -p 8000:8000 --env-file .env_docker --name remanga --network host web
+      # - name: Build and test
+      #   run: |
+      #     docker build -t web .
+      #     docker run -d -p 8000:8000 --env-file .env_docker --name remanga --network host web
 
       - name: Tests
         run: pytest
