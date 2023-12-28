@@ -1,5 +1,6 @@
 Снять видео через web и залить на youtube по ссылке
 
+git add .; git commit -m "README"; git push
 -------------------------------------------
 
 Django Подправить код, как в fastapi.
