@@ -1,9 +1,4 @@
-python -m alembic revision --autogenerate -m "release"
-alembic upgrade head
-
--------------------------------------------
-
-Залить на python anywhere или куда-нибудь еще
+Оформить github. Снять видео
 
 -------------------------------------------
 
