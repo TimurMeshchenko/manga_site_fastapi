@@ -18,7 +18,7 @@ from auth.exceptions import invalid_csrf_token
 from config import Config
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> Generator:   
+async def lifespan(app: FastAPI) -> Generator:  
     config = Config()
     loop = get_event_loop()
 

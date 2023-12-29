@@ -992,7 +992,7 @@
                       <div class="jsx-a1b2d119e625548b Comments_wrap__7NbKY"> 
                         {% for comment in title.comments|sort(attribute='created_at', reverse=true) %} 
                         <div class="jsx-3914328852 Comments_media__5h5tS">
-                          <a href="">
+                          <a href="/user/{{ comment.author.id }}" class="jsx-3914328852">
                             {% if comment.author.avatar %}
                             <img src="/media/users_avatars/{{ comment.author.avatar }}" alt="..."
                               class="jsx-3914328852 Comments_mediaAvatar__IuIbH" />

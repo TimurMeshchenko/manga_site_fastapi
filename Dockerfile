@@ -7,9 +7,11 @@ WORKDIR /remanga_fastapi
 
 COPY remanga_fastapi .
 COPY requirements.txt .
+COPY docker .
 
+RUN apt-get update && apt-get install -y netcat-openbsd
 RUN pip install --no-cache-dir -r requirements.txt
 
-WORKDIR src
+RUN chmod +x /remanga_fastapi/entrypoint.sh
 
-CMD gunicorn main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000
+ENTRYPOINT "/remanga_fastapi/entrypoint.sh"
