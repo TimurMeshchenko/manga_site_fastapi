@@ -48,7 +48,6 @@ class Title(Base):
     chapters = relationship('Title_chapters', back_populates="title")
     comments = relationship('Comment', back_populates='title')
 
-
 class Title_chapters(Base):
     __tablename__ = 'remanga_title_chapters'
 
