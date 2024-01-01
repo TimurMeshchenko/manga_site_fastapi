@@ -1,4 +1,4 @@
-# #!/bin/bash
+#!/bin/bash
 
 until nc -z $RABBITMQ_HOST 5672; do
   echo "Waiting for RabbitMQ to be available..."
